@@ -16,3 +16,4 @@ Each participant should create a folder and store their entires there.  The fold
 
 1. [USACO Problem Guide](https://usaco.guide/problems/)
 1. [Algorithms for Competitive Programming](https://cp-algorithms.com/)
+1. [USA Computing Olympiad - Contests Page](http://www.usaco.org/index.php?page=contests)
