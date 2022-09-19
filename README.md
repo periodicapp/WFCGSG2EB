@@ -10,3 +10,4 @@ Each participant should create a folder and store their entires there.  The fold
 
 
 1. *Week 1 - 2022-09-16 - 4Sum* - Solve either [4Sum](https://leetcode.com/problems/4sum/) or [2Sum](https://leetcode.com/problems/two-sum/) according to the instructions on LeetCode.
+1. *Week 2 - 2022-09-23 - Longest Palindrom Substring* - Solve either [Palindrome Number](https://leetcode.com/problems/palindrome-number/) or [Longest Palindrome Substring](https://leetcode.com/problems/longest-palindromic-substring/) according to the instructions on LeetCode.
