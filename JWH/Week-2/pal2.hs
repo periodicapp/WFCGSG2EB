@@ -87,8 +87,29 @@ maximumPalindrome input =
   in
     take (j-i+1) . drop i $ input
 
---main = print $ maximumPalindrome "abbbbb"
---main = print $ maximumPalindrome "abbbbac"
---main = print $ maximumPalindrome "dabbbbac"
---main = print $ maximumPalindrome "cbbd"
-main = print $ maximumPalindrome "abcdefg"
+--data type for tests - returns either Passed or Failed.  When failed, includes
+--the input it failed on
+data Result = Passed | Failed [Char]
+  deriving Show
+
+--runTest takes a pair of strings - the first is an input, the second is an
+--expected output - and returns a Result.  The Result will be Passed if
+--maximumPalindrome run on the first string in the pair returns the expected
+--output.  Otherwise, it will be Failed with the failed input included (as per
+--the type definition).
+runTest :: ([Char],[Char]) -> Result
+runTest (input,output)
+  | maximumPalindrome input == output = Passed
+  | otherwise = Failed input
+
+--runSuite runs runTest over a list of test pairs
+runSuite :: [([Char],[Char])] -> [Result]
+runSuite = map runTest
+
+main = mapM (\x -> print x) $ runSuite [
+            ("abbbb", "bbbb")
+          , ("abbbbac", "abbbba")
+          , ("aabbbbac", "abbbba")
+          , ("cbbd", "bb")
+          , ("abcdefg", "")
+        ]
