@@ -63,12 +63,23 @@ maxpal chs pos stop (i,j)
   | otherwise = maxpal chs (pos+1) stop (i,j)
 
 --maximumPalindrome takes a string and returns the substring that corresponds
---to the longest palindrome if it exists; "" otherwise.  It does this by first
---generating a list of pairs of indices of every substring in the string that
---is a palindrome. Then, it subtracts the first member of each pair from the
---second to find the longest one. Using the indices representing the
---longest-length palindrome, it pulls that substring out of the original
---string.
+--to the longest palindrome if it exists; "" otherwise.  It does this by
+--iterating over the string for every position from the start to a point 2
+--characters from the end.  At each point, it determines whether the current
+--position represents the start of a "kernel" palindrome, where a kernel is
+--either two of the same character in a row (an "even" kernel) or the same two
+--characters separated by another character - i.e. a pattern of type xyx (an
+--"odd" kernel).  If the current position is the kernel of a palindrome, it
+--extends the start and end indices by one and checks whether the two
+--characters at the new indices are the same.  If they are, it's still a
+--palindrome, so keep going until this condition is no longer true (or until we
+--run off the ends of the string).  If this new palindrome is longer than any
+--seen so far, replace the current candidate with this one, advance the current
+--position by one and recur.  If it is not longer (or if the current position
+--is not a kernel), advance the current position by one and keep looking with
+--the current candidate.  When the current position is past the stop point,
+--return the current candidate.  This algorithm is implemented by the helper
+--function maxpal.
 maximumPalindrome :: [Char] -> [Char]
 maximumPalindrome input = 
   let 
