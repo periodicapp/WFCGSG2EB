@@ -57,6 +57,7 @@ maximumPair ((i,j):xs) cand l
     
 maxPair :: [(Int,Int)] -> (Int,Int)
 maxPair ((i,j):iss) = maximumPair ((i,j):iss) (i,j) (j-i)
+maxPair [] = (0,-1)
 
 maximumPalindrome :: [Char] -> [Char]
 maximumPalindrome input = 
@@ -77,4 +78,5 @@ maximumPalindrome input =
 --main = print $ expandPalindrome (3,4) "dabbbbac"
 --main = print $ maxPair $ allPalindromes "dabbbbac"
 --main = print $ maximumPalindrome "dabbbbac"
-main = print $ maximumPalindrome "cbbd"
+--main = print $ maximumPalindrome "cbbd"
+main = print $ maximumPalindrome "abcdefg"
