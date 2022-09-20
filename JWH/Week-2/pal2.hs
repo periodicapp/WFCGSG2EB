@@ -114,5 +114,9 @@ main = mapM (\x -> print x) $ runSuite [
           , ("aaabcdef", "aaa")
           , ("aaabcdefghiihg", "ghiihg")
           , ("cbbd", "bb")
+          , ("bb", "bb")
+          , ("bab", "bab")
+          , ("bbb", "bbb")
+          , ("bbbb", "bbbb")
           , ("abcdefg", "")
         ]
