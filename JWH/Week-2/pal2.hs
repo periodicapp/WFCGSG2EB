@@ -87,16 +87,6 @@ maximumPalindrome input =
   in
     take (j-i+1) . drop i $ input
 
---main = print $ isEvenKernel 0 "abb"
---main = print $ isOddKernel 3 "ababac"
---main = print $ allOddKernels "ababac"
---main = print $ allEvenKernels "ababac"
---main = print $ allEvenKernels "abbbac"
---main = print $ allOddKernels "abbbac"
---main = print $ expandPalindrome (1,3) "abbbac"
---main = print $ expandPalindrome (2,4) "dabbbac"
---main = print $ expandPalindrome (3,4) "dabbbbac"
---main = print $ mpal "abbbb"
 --main = print $ maximumPalindrome "abbbbb"
 --main = print $ maximumPalindrome "abbbbac"
 --main = print $ maximumPalindrome "dabbbbac"
