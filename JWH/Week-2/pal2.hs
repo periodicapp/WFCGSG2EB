@@ -62,6 +62,13 @@ maxpal chs pos stop (i,j)
   | isOddKernel pos chs = maxpal chs (pos+1) stop (maxPair [(i,j),expandPalindrome chs (pos,pos+2)])
   | otherwise = maxpal chs (pos+1) stop (i,j)
 
+
+--getIndexedSubstring is a helper function for maximumPalindrome that
+--implements the part that gets the relevant palindromic substring out of the
+--input string
+getIndexedSubstring :: [Char] -> Int -> Int -> [Char]
+getIndexedSubstring input i j = take (j-i+1) . drop i $ input
+
 --maximumPalindrome takes a string and returns the substring that corresponds
 --to the longest palindrome if it exists; "" otherwise.  It does this by
 --iterating over the string for every position from the start to a point 2
@@ -79,13 +86,18 @@ maxpal chs pos stop (i,j)
 --is not a kernel), advance the current position by one and keep looking with
 --the current candidate.  When the current position is past the stop point,
 --return the current candidate.  This algorithm is implemented by the helper
---function maxpal.
+--function maxpal.  There are also three "guard" cases that handle edge cases
+--that arise from the input string being 2 characters or fewer.
 maximumPalindrome :: [Char] -> [Char]
-maximumPalindrome input = 
-  let 
-    (i,j) = maxpal input 0 ((length input) - 3) (0,-1)
-  in
-    take (j-i+1) . drop i $ input
+maximumPalindrome input
+  | (length input) <= 1 = ""
+  | (length input) == 2 && isEvenKernel 0 input = input
+  | (length input) == 2 = ""
+  | otherwise = 
+      let 
+        (i,j) = maxpal input 0 ((length input) - 3) (0,-1)
+      in
+        getIndexedSubstring input i j
 
 --data type for tests - returns either Passed or Failed.  When failed, includes
 --the input it failed on
