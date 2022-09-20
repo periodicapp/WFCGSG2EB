@@ -1,0 +1,93 @@
+--isEvenKernel takes an index and a string and returns True if this index
+--points to the first of two adjacent identical characters, False otherwise.
+isEvenKernel :: Int -> [Char] -> Bool
+isEvenKernel a chs = chs !! a == chs !! (a+1)
+
+--isOddKernel takes a index and a string and returns True if this index points
+--to the first of a triple of characters where the first and last are
+--identical, False otherwise.
+isOddKernel :: Int -> [Char] -> Bool 
+isOddKernel a chs = chs !! a == chs !! (a+2)
+
+--expandPalindrome is a helper function for maxpal.  It takes an input
+--string and a pair of indices representing a palindrome "kernel" and expands
+--the pair of indices as far as it can while the expansion continues to
+--represent a palindrome.  The expansion adds one to the right index and
+--substracts one from the left index and checks whether the characters at the
+--new indices are equal.  If they are, this is a legitimate expansion -
+--recurse.  If not, it's not, so return the original pair.
+expandPalindrome :: [Char] -> (Int,Int) -> (Int,Int)
+expandPalindrome chs (a,b)
+  | a == 0 = (a,b)
+  | b == (length chs) - 1 = (a,b)
+  | chs !! (a-1) == chs !! (b+1) = expandPalindrome chs (a-1,b+1)
+  | otherwise = (a,b)
+
+
+--maximumPair takes a list of integer tuples, a current candidate tuple, and a
+--current maximum length, and it iterates over the list of tuples until it
+--finds the one representing the longest length.  This is the implementation
+--function for maxPair.
+maximumPair :: [(Int,Int)] -> (Int,Int) -> Int -> (Int,Int)
+maximumPair ((i,j):xs) cand l
+  | (length xs) == 0 && j - i > l = (i,j)
+  | (length xs) == 0 = cand
+  | j - i > l = maximumPair xs (i,j) (j-i)
+  | otherwise = maximumPair xs cand l
+    
+--maxPair takes a list of pairs of indices and returns the pair spanning the
+--most distance.  When given an empty list, returns (0,-1) (since this will
+--result in returning the empty string when passed to the main function).
+maxPair :: [(Int,Int)] -> (Int,Int)
+maxPair ((i,j):iss) = maximumPair ((i,j):iss) (i,j) (j-i)
+maxPair [] = (0,-1)
+
+--maxpal is the implementation function for maximumPalindrome.  It takes a
+--string, an integer representing the current position in the string, the
+--position at which it should stop (which is 2 from the end) and the current
+--index pair of the candidate for the longest palindrome substring.  It does
+--this by first checking whether the current position represents a "kernel" -
+--which is the center 2 or 3 characters of a palindrome.  If the current
+--position is beyond the stop position, we're done - return the current
+--candidate.  If the current position is a kernel, expand the palindrome as far
+--as it will go and, if it is longer than the current candidate, advance the
+--current position by one and recur with the new index pair.  If it's not
+--longer, or if the current position is not a kernel, advance the current
+--position by one and recur with the current index pair.
+maxpal :: [Char] -> Int -> Int -> (Int,Int) -> (Int,Int)
+maxpal chs pos stop (i,j)
+  | pos > stop = (i,j)
+  | isEvenKernel pos chs && isOddKernel pos chs = maxpal chs (pos+1) stop (maxPair [(i,j), expandPalindrome chs (pos,pos+1), expandPalindrome chs (pos,pos+2)])
+  | isEvenKernel pos chs = maxpal chs (pos+1) stop (maxPair [(i,j),expandPalindrome chs (pos,pos+1)])
+  | isOddKernel pos chs = maxpal chs (pos+1) stop (maxPair [(i,j),expandPalindrome chs (pos,pos+2)])
+  | otherwise = maxpal chs (pos+1) stop (i,j)
+
+--maximumPalindrome takes a string and returns the substring that corresponds
+--to the longest palindrome if it exists; "" otherwise.  It does this by first
+--generating a list of pairs of indices of every substring in the string that
+--is a palindrome. Then, it subtracts the first member of each pair from the
+--second to find the longest one. Using the indices representing the
+--longest-length palindrome, it pulls that substring out of the original
+--string.
+maximumPalindrome :: [Char] -> [Char]
+maximumPalindrome input = 
+  let 
+    (i,j) = maxpal input 0 ((length input) - 3) (0,-1)
+  in
+    take (j-i+1) . drop i $ input
+
+--main = print $ isEvenKernel 0 "abb"
+--main = print $ isOddKernel 3 "ababac"
+--main = print $ allOddKernels "ababac"
+--main = print $ allEvenKernels "ababac"
+--main = print $ allEvenKernels "abbbac"
+--main = print $ allOddKernels "abbbac"
+--main = print $ expandPalindrome (1,3) "abbbac"
+--main = print $ expandPalindrome (2,4) "dabbbac"
+--main = print $ expandPalindrome (3,4) "dabbbbac"
+--main = print $ mpal "abbbb"
+--main = print $ maximumPalindrome "abbbbb"
+--main = print $ maximumPalindrome "abbbbac"
+--main = print $ maximumPalindrome "dabbbbac"
+--main = print $ maximumPalindrome "cbbd"
+main = print $ maximumPalindrome "abcdefg"
