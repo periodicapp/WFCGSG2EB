@@ -12,6 +12,7 @@ func main() {
 	fmt.Println("isPalindrome(123450)", isPalindrome(123450))
 	fmt.Println("isPalindrome(-20)", isPalindrome(-20))
 	fmt.Println("isPalindrome(15799751)", isPalindrome(15799751))
+	fmt.Println("isPalindrome(1234567890987654321)", isPalindrome(1234567890987654321))
 }
 
 func isPalindrome(x int) bool {
