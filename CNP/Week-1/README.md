@@ -10,5 +10,4 @@ Language: Golang
 
 User: Chris Page
 
-### To Run Code
-Copy and paste (entire) code in https://goplay.tools/ and select run;
+
