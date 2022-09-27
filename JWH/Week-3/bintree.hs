@@ -20,21 +20,21 @@ treeNode t =
     (Branch x _ _) -> x
     Empty -> 0
 
-children :: BinTree Int -> [Int]
-children t =
+treeChildren :: BinTree Int -> [Int]
+treeChildren t =
   case t of
     (Branch x Empty Empty) -> [] 
-    (Branch x y Empty) -> [treeNode y,0] ++ children y
+    (Branch x y Empty) -> [treeNode y,0] ++ treeChildren y
     (Branch x Empty y) -> [0] ++ toArray y
-    (Branch x y z) -> [treeNode y, treeNode z] ++ children y ++ children z
+    (Branch x y z) -> [treeNode y, treeNode z] ++ treeChildren y ++ treeChildren z
 
 toArray :: BinTree Int -> [Int]
 toArray t = 
   case t of
     (Branch x Empty Empty) -> [x]
     (Branch x Empty y) -> [x,0] ++ toArray y
-    (Branch x y Empty) -> [x] ++ [treeNode y,0] ++ children y
-    (Branch x y z) -> [x] ++ [treeNode y, treeNode z] ++ children y ++ children z
+    (Branch x y Empty) -> [x, treeNode y, 0] ++ treeChildren y
+    (Branch x y z) -> [x, treeNode y, treeNode z] ++ treeChildren y ++ treeChildren z
     Empty -> [0]
 
 allCombine :: [[Int]] -> [[Int]] -> [[Int]]
