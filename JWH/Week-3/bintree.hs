@@ -34,6 +34,7 @@ children t =
 toArray :: BinTree Int -> [Int]
 toArray t = 
   case t of
+    (Branch x Empty Empty) -> [x]
     (Branch x Empty y) -> [x,0] ++ toArray y
     (Branch x y Empty) -> [x] ++ [treeNode y] ++ children y ++ [0]
     (Branch x y z) -> [x] ++ [treeNode y, treeNode z] ++ children y ++ children z
