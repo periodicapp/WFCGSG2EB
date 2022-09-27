@@ -56,5 +56,8 @@ allSorts ls =
 genInsertOrders :: Int -> [[Int]]
 genInsertOrders n = allSorts [1..n]
 
-main = mapM (print . toArray . construct) $ genInsertOrders 3
+printResults :: [[Int]] -> IO [()]
+printResults = mapM (print . toArray . construct) 
+
+main = printResults $ genInsertOrders 3
 --main = mapM (print . toArray . construct) $ allSorts [1,2,3,4,5,6,7,8]
