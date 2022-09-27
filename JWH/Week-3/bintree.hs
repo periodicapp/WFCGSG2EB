@@ -14,6 +14,8 @@ construct (x:xs) =
       (_,[]) -> Branch x (construct l) Empty
       (_,_) -> Branch x (construct l) (construct r)
 
+construct [] = Empty
+
 treeNode :: BinTree Int -> Int
 treeNode t =
   case t of
