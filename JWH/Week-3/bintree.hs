@@ -2,20 +2,17 @@
 data BinTree a = Empty | Branch a (BinTree a) (BinTree a)
   deriving (Show)
 
-construct' :: Int -> [Int] -> [Int] -> BinTree Int
-construct' x l r
-  | l == [] && r == [] = Branch x Empty Empty 
-  | l == [] = Branch x Empty (construct r)
-  | r == [] = Branch x (construct l) Empty
-  | otherwise = Branch x (construct l) (construct r)
-
 construct :: [Int] -> BinTree Int
 construct (x:xs) = 
   let 
-    left = filter (<x) xs
-    right = filter (>x) xs
+    l = filter (<x) xs
+    r = filter (>x) xs
   in
-    construct' x left right 
+    case (l,r) of
+      ([],[]) -> Branch x Empty Empty
+      ([],_) -> Branch x Empty (construct r)
+      (_,[]) -> Branch x (construct l) Empty
+      (_,_) -> Branch x (construct l) (construct r)
 
 treeNode :: BinTree Int -> Int
 treeNode t =
@@ -54,4 +51,5 @@ allSorts ls =
     [x] -> [[x]]
     otherwise -> [zs | i <- ls, zs <- map (i:) $ allCombine (allSorts (filter (<i) ls)) (allSorts (filter (>i) ls))]
 
-main = mapM (print . toArray . construct) $ allSorts [1,2,3,4,5,6,7,8]
+main = mapM (print . toArray . construct) $ allSorts [1,2,3]
+--main = mapM (print . toArray . construct) $ allSorts [1,2,3,4,5,6,7,8]
