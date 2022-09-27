@@ -27,7 +27,7 @@ children :: BinTree Int -> [Int]
 children t =
   case t of
     (Branch x Empty Empty) -> [] 
-    (Branch x y Empty) -> toArray y
+    (Branch x y Empty) -> [treeNode y,0] ++ children y
     (Branch x Empty y) -> [0] ++ toArray y
     (Branch x y z) -> [treeNode y, treeNode z] ++ children y ++ children z
 
@@ -36,8 +36,25 @@ toArray t =
   case t of
     (Branch x Empty Empty) -> [x]
     (Branch x Empty y) -> [x,0] ++ toArray y
-    (Branch x y Empty) -> [x] ++ [treeNode y] ++ children y ++ [0]
+    (Branch x y Empty) -> [x] ++ [treeNode y,0] ++ children y
     (Branch x y z) -> [x] ++ [treeNode y, treeNode z] ++ children y ++ children z
     Empty -> [0]
 
-main = print $ toArray $ construct [3,4,1,5,2]
+main = mapM (print . toArray . construct) [
+         [1,2,3]
+       , [1,3,2]
+       , [3,1,2]
+       , [3,2,1]
+       , [2,1,3]
+       , [1,2,3,4,5]
+       , [1,3,2,4,5]
+       , [1,3,4,2,5]
+       , [1,3,4,5,2]
+       ]
+--main = print $ toArray $ construct [3,4,1,5,2]
+--main = print $ toArray $ construct [5,4,1,3,2]
+--main = print $ toArray $ construct [1,2,3,4,5]
+--main = print $ toArray $ construct [2,1,3,4,5]
+--main = print $ toArray $ construct [3,1,2,4,5]
+--main = print $ toArray $ construct [4,1,2,3,5]
+--main = print $ toArray $ construct [5,1,2,3,4]
