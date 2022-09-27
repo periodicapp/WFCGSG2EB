@@ -53,5 +53,8 @@ allSorts ls =
     [x] -> [[x]]
     otherwise -> [zs | i <- ls, zs <- map (i:) $ allCombine (allSorts (filter (<i) ls)) (allSorts (filter (>i) ls))]
 
-main = mapM (print . toArray . construct) $ allSorts [1,2,3]
+genInsertOrders :: Int -> [[Int]]
+genInsertOrders n = allSorts [1..n]
+
+main = mapM (print . toArray . construct) $ genInsertOrders 3
 --main = mapM (print . toArray . construct) $ allSorts [1,2,3,4,5,6,7,8]
