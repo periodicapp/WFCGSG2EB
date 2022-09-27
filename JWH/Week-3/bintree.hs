@@ -1,4 +1,4 @@
-
+-- data type for binary tree
 data BinTree a = Empty | Branch a (BinTree a) (BinTree a)
   deriving (Show)
 
@@ -40,25 +40,18 @@ toArray t =
     (Branch x y z) -> [x] ++ [treeNode y, treeNode z] ++ children y ++ children z
     Empty -> [0]
 
-main = mapM (print . toArray . construct) [
-         [1,2,3]
-       , [1,3,2]
-       , [2,1,3]
-       , [3,1,2]
-       , [3,2,1]
-       , [1,2,3,4,5]
-       , [1,3,2,4,5]
-       , [1,3,2,5,4]
-       , [1,4,2,3,5]
-       , [1,4,3,2,5]
-       , [1,5,2,3,4]
-       , [1,5,2,4,3]
-       , [1,5,3,2,4]
-       ]
---main = print $ toArray $ construct [3,4,1,5,2]
---main = print $ toArray $ construct [5,4,1,3,2]
---main = print $ toArray $ construct [1,2,3,4,5]
---main = print $ toArray $ construct [2,1,3,4,5]
---main = print $ toArray $ construct [3,1,2,4,5]
---main = print $ toArray $ construct [4,1,2,3,5]
---main = print $ toArray $ construct [5,1,2,3,4]
+allCombine :: [[Int]] -> [[Int]] -> [[Int]]
+allCombine l r = 
+  case (l,r) of
+    ([],_) -> r
+    (_,[]) -> l
+    otherwise -> [li++ri | li <- l, ri <- r]
+
+allSorts :: [Int] -> [[Int]]
+allSorts ls =
+  case ls of 
+    [] -> []
+    [x] -> [[x]]
+    otherwise -> [zs | i <- ls, zs <- map (i:) $ allCombine (allSorts (filter (<i) ls)) (allSorts (filter (>i) ls))]
+
+main = mapM (print . toArray . construct) $ allSorts [1,2,3,4,5,6,7,8]
