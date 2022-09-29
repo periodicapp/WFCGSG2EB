@@ -60,6 +60,76 @@ toArray t =
     (Branch x y z) -> [x, treeNode y, treeNode z] ++ treeChildren y ++ treeChildren z
     Empty -> [0]
 
+-- genFullArrayPairs - takes the number of the starting node (for various
+-- reasons, this should always be 1) and a BinTree of Int and assigns an array
+-- position (in a canonical array representation of the tree) to each node in
+-- the tree, returning an array of pairs which represent the array position of
+-- the node paired with the value contained in the node
+genFullArrayPairs :: Int -> BinTree Int ->  [(Int,Int)]
+genFullArrayPairs n t = 
+  case t of
+    (Branch x Empty Empty) -> [(n,x)]
+    (Branch x Empty y) -> [(n,x)] ++ genFullArrayPairs (2*n+1) y
+    (Branch x y Empty) -> [(n,x)] ++ genFullArrayPairs (2*n) y
+    (Branch x y z) -> [(n,x)] ++ (genFullArrayPairs (2*n) y) ++ (genFullArrayPairs (2*n+1) z)
+    Empty -> [(0,0)]
+
+-- getTreeHeight - given an (Int,Int) tuple that represents a node in a binary
+-- tree, where the left member is the position of the node in an array
+-- representation of the tree and the right member is the value stored there,
+-- find the minimum height of the binary tree needed to store this item.  It
+-- does this by generating a list of integers and comparing the position (the
+-- left member of the tuple) to the value of 2 raised to the power of each
+-- number in the list.  As soon as the left member is *less than* this value,
+-- you've found the height of the tree.  (e.g. if the position in the array
+-- representation is 7, this will return 3, because 7 is less than 2^3 = 8, but
+-- is greater than 2^2=4)
+getTreeHeight :: (Int,Int) -> Int
+getTreeHeight (n,_) = (+1) . last $ (takeWhile (\x -> n>=(2^x)) [0..] :: [Int])
+
+-- initializeArray - return an array of 0s that is the length of 2^n.  This is
+-- for generating an initial seed representation of a binary tree of depth n
+-- (that will be filled with the actual values after the tree is generated).
+initializeArray :: Int -> [Int]
+initializeArray n = take (2^n-1) $ repeat 0
+
+-- gtNode is a comparison function that takes two tuples of Ints and returns
+-- whichever one has the greater left member
+gtNode :: (Int,Int) -> (Int,Int) -> (Int,Int)
+gtNode (x,x1) (y,y1) = if x >= y then (x,x1) else (y,y1)
+
+-- maxNode finds the (Int,Int) tuple in a list of (Int,Int) tuples which has
+-- the largest left member
+maxNode :: [(Int,Int)] -> (Int,Int)
+maxNode = foldr1 gtNode
+
+-- setPosition takes an (Int,Int) tuple representing an index (starting at 1)
+-- paired with a value and then takes a list of Int and sets the value in the
+-- array at the position indicated by the index to the value in the tuple
+setPosition :: (Int,Int) -> [Int] -> [Int]
+setPosition (i,v) arr = map (\(x,y) -> if x == i then v else y) (zip [1..] arr)
+
+-- setPositions takes a list of (Int,Int), each of which represents a pairing
+-- of an array index (starting at 1) with a value that should appear at that
+-- index, and then an array, and it sets the values as indicated by the
+-- pairings (e.g. [(1,2),(3,4)] applied to [0,0,0,0] results in [2,0,3,0]).  
+setPositions :: [(Int,Int)] -> [Int] -> [Int]
+setPositions tps tr = foldr setPosition tr $ tps
+
+-- toLevelOrderArray takes a BinTree Int and returns an array representation of it -
+-- where the position in the array (indexed starting at 1) represents the
+-- position in the tree if we have (a) a full, balanced tree (i.e. even empty
+-- nodes are represented) in which (b) the nodes are numbered by level-order
+-- traversal.
+toLevelOrderArray :: BinTree Int -> [Int]
+toLevelOrderArray t =
+  let
+    treepairs = genFullArrayPairs 1 t
+    arr = initializeArray . getTreeHeight . maxNode $ treepairs
+  in
+    setPositions treepairs arr
+    
+
 -- allCombine is a helper function for allSorts that takes two lists of lists
 -- and combines then into one list of lists by adjoining every list in the
 -- second collection to every item in the first
@@ -101,5 +171,10 @@ genInsertOrders n = allSorts [1..n]
 printResults :: [[Int]] -> IO [()]
 printResults = mapM (print . toArray . construct) 
 
-main = printResults $ genInsertOrders 3
---main = mapM (print . toArray . construct) $ allSorts [1,2,3,4,5,6,7,8]
+-- printLevelOrderResults does what printResults does but uses LevelOrder,
+-- since it's clearer to the programmer how this works
+printLevelOrderResults :: [[Int]] -> IO [()]
+printLevelOrderResults = mapM (print . toLevelOrderArray . construct)
+
+--main = printResults $ genInsertOrders 3
+main = printLevelOrderResults $ genInsertOrders 3
