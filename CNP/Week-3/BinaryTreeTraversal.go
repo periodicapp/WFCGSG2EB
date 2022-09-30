@@ -10,7 +10,7 @@ type TreeNode struct {
 
 // https://leetcode.com/problems/binary-tree-inorder-traversal/
 
-//  Left - Value - Right
+//  Left - Value(Root Node) - Right
 func inorderTraversal(root *TreeNode) []int {
 
 	ans := []int{}
@@ -33,7 +33,7 @@ func inorderTraversal(root *TreeNode) []int {
 }
 
 // https://leetcode.com/problems/binary-tree-postorder-traversal/
-// Left - Right - Value
+// Left - Right - Value(Root Node)
 func postorderTraversal(root *TreeNode) []int {
 
 	ans := []int{}
@@ -56,7 +56,7 @@ func postorderTraversal(root *TreeNode) []int {
 }
 
 //  https://leetcode.com/problems/binary-tree-preorder-traversal/
-// Value - Left - Right
+// Value(Root Node) - Left - Right
 func preorderTraversal(root *TreeNode) []int {
 
 	ans := []int{}
