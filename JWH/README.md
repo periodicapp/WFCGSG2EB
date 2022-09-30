@@ -4,7 +4,7 @@ These are the solutions for WFCGSG2EB problems by Joshua Herring
 
 ## How to Run
 
-All solutions are in Haskell.  You will need a Haskell compiler installed to run them.  The solutions given were compiled with GHC version 8.10.7. 
+All solutions are in Haskell.  You will need a Haskell compiler installed to run them.  The solutions given were compiled with GHC version 8.10.7.
 
 ## Manifest
 
