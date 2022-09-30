@@ -11,5 +11,5 @@ Language: Golang
 User: Chris Page
 
 #### To Run Code
-Copy and paste (entire) code function into above leetcode link and hit `Run Code`
+Copy and paste (entire) corresponding function into above leetcode link and hit `Run Code`
 
