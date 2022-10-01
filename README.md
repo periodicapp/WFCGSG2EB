@@ -22,4 +22,5 @@ Each participant should create a folder and store their entries there.  The fold
 
 ### Week 4 - Sudoku
 1. [Top 95 "Hard" Sudoku Puzzles](http://magictour.free.fr/top95)
+1. [50 "Easy" Sudoku Puzzles](https://norvig.com/easy50.txt)
 1. [Sudoku Solving Strategies](https://www.sudokuwiki.org/sudoku.htm)
