@@ -42,12 +42,35 @@ renderGridLine ls =
 getRow :: [Int] -> Int -> [Int]
 getRow grd i = gtrw grd ((i*9)-1) 0 
   where 
-    gtrw (r:rs) j c
-        | j < 0 || j > 81 = take 9 (r:rs)
+    gtrw (r:rw) j c
+        | j < 0 || j > 81 = take 9 (r:rw)
         | c > 81 || c < 0 = []
-        | c == j = take 9 $ rs
-        | otherwise = gtrw rs j (c+1)
+        | c == j = take 9 $ rw
+        | otherwise = gtrw rw j (c+1)
 
+getColumn :: [Int] -> Int -> [Int]
+getColumn grd i = gtcl grd i 0
+  where
+    gtcl (c:cl) j k
+      | j < 0 = gtcl grd 0 0
+      | j > 80 = []
+      | k > 80 || k < 0 = []
+      | k == j = c : (gtcl cl (j+9) (k+1))
+      | otherwise = gtcl cl j (k+1)
+
+getGrid' :: [Int] -> (Int,Int) -> Int -> [Int]
+getGrid' grd (rowoffset,columnoffset) limit
+  | rowoffset < limit = (((take 3) . (drop columnoffset) . (getRow grd)) $ rowoffset) ++ (getGrid' grd (rowoffset+1,columnoffset) limit)
+  | otherwise = []
+  
+getGrid :: [Int] -> (Int,Int) -> [Int]
+getGrid grd (row,column) =
+  let
+    rowoffset = (row `div` 3) * 3
+    columnoffset = (column `div` 3) * 3
+  in
+    getGrid' grd (rowoffset,columnoffset) (rowoffset+3)
+    
 printGrid :: PuzzleGrid -> [Char]
 printGrid (PuzzleGrid pg) = (foldr (++) "") . renderGridLine . gridNumbers $ (PuzzleGrid pg)
 
@@ -59,5 +82,7 @@ main =
     --print $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
     putStr $ printGrid $ readPuzzle $ ((!!0) . lines) input
     print $ ((flip getRow) 0) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
-    print $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
+    print $ ((flip getColumn) 0) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
+    print $ (flip getGrid (0,0)) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
+    --print $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
     --print $ readPuzzle $ ((!!0) . lines) input
