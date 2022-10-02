@@ -39,14 +39,25 @@ renderGridLine ls =
   in
     separated
 
+getRow :: [Int] -> Int -> [Int]
+getRow grd i = gtrw grd ((i*9)-1) 0 
+  where 
+    gtrw (r:rs) j c
+        | j < 0 || j > 81 = take 9 (r:rs)
+        | c > 81 || c < 0 = []
+        | c == j = take 9 $ rs
+        | otherwise = gtrw rs j (c+1)
+
 printGrid :: PuzzleGrid -> [Char]
 printGrid (PuzzleGrid pg) = (foldr (++) "") . renderGridLine . gridNumbers $ (PuzzleGrid pg)
 
 --main = print $ initGrid 0 $ take 81 (repeat 0)
 main = 
   do
-    input <- readFile "top95-0.txt"
-    mapM (putStr . printGrid . readPuzzle) $ lines $ input
+    input <- readFile "easy50.txt"
+    --mapM (putStr . printGrid . readPuzzle) $ lines $ input
     --print $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
-    --putStr $ printGrid $ readPuzzle $ ((!!0) . lines) input
+    putStr $ printGrid $ readPuzzle $ ((!!0) . lines) input
+    print $ ((flip getRow) 0) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
+    print $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
     --print $ readPuzzle $ ((!!0) . lines) input
