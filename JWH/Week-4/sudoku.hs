@@ -1,8 +1,8 @@
 import Data.Char (digitToInt, intToDigit, chr)
 import Data.List (intersperse)
 
-data PuzzleGrid = PuzzleGrid [[Int]]
-  deriving (Show)
+--data PuzzleGrid = PuzzleGrid [[Int]]
+--  deriving (Show)
 
 initGrid :: Int -> [Int] -> [[Int]]
 initGrid i = map (\x -> x:(take 10 (repeat i))) 
@@ -10,11 +10,11 @@ initGrid i = map (\x -> x:(take 10 (repeat i)))
 convertString :: [Char] -> [Int]
 convertString = map digitToInt
 
-gridNumbers :: PuzzleGrid -> [Int]
-gridNumbers (PuzzleGrid pg) = map head pg
+gridNumbers :: [[Int]] -> [Int]
+gridNumbers pg = map head pg
 
-readPuzzle :: [Char] -> PuzzleGrid 
-readPuzzle = PuzzleGrid . (initGrid 0) . convertString
+readPuzzle :: [Char] -> [[Int]] 
+readPuzzle = (initGrid 1) . convertString
 
 chunksOf :: Int -> [a] -> [[a]]
 chunksOf _ [] = []
@@ -39,14 +39,27 @@ renderGridLine ls =
   in
     separated
 
+getItemsAtIndexes :: [a] -> [Int] -> [a]
+getItemsAtIndexes pg [] = [] 
+getItemsAtIndexes pg (i:idxs)
+  | idxs == [] = [(pg !! i)]
+  | otherwise = (pg !! i) : getItemsAtIndexes pg idxs
+
+getIndexesForRow :: Int -> [Int]
+getIndexesForRow i
+  | i >= 0 && i < 81 && i `mod` 9 == 0 = [i..(i+8)]
+  | otherwise = []
+
+
 getRow :: [Int] -> Int -> [Int]
-getRow grd i = gtrw grd ((i*9)-1) 0 
-  where 
-    gtrw (r:rw) j c
-        | j < 0 || j > 81 = take 9 (r:rw)
-        | c > 81 || c < 0 = []
-        | c == j = take 9 $ rw
-        | otherwise = gtrw rw j (c+1)
+getRow grd i = getItemsAtIndexes grd (getIndexesForRow i)
+--getRow grd i = gtrw grd ((i*9)-1) 0 
+--  where 
+--    gtrw (r:rw) j c
+--        | j < 0 || j > 81 = take 9 (r:rw)
+--        | c > 81 || c < 0 = []
+--        | c == j = take 9 $ rw
+--        | otherwise = gtrw rw j (c+1)
 
 getColumn :: [Int] -> Int -> [Int]
 getColumn grd i = gtcl grd i 0
@@ -71,8 +84,8 @@ getGrid grd (row,column) =
   in
     getGrid' grd (rowoffset,columnoffset) (rowoffset+3)
     
-printGrid :: PuzzleGrid -> [Char]
-printGrid (PuzzleGrid pg) = (foldr (++) "") . renderGridLine . gridNumbers $ (PuzzleGrid pg)
+printGrid :: [[Int]] -> [Char]
+printGrid = (foldr (++) "") . renderGridLine . gridNumbers
 
 --main = print $ initGrid 0 $ take 81 (repeat 0)
 main = 
@@ -82,7 +95,10 @@ main =
     --print $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
     putStr $ printGrid $ readPuzzle $ ((!!0) . lines) input
     print $ ((flip getRow) 0) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
+    --print $ ((flip getItemsAtIndexes) (getIndexesForRow 0)) $ readPuzzle $ ((!!0) . lines) input
+    print $ getIndexesForRow 0
     print $ ((flip getColumn) 0) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
     print $ (flip getGrid (0,0)) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
+    print $ (flip getItemsAtIndexes [0,4,8]) $ readPuzzle $ ((!!0) . lines) input
     --print $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
     --print $ readPuzzle $ ((!!0) . lines) input
