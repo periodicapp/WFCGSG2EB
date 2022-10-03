@@ -4,8 +4,8 @@ import Data.List (intersperse)
 --data PuzzleGrid = PuzzleGrid [[Int]]
 --  deriving (Show)
 
-initGrid :: Int -> [Int] -> [[Int]]
-initGrid i = map (\x -> x:(take 9 (repeat i))) 
+initGrid :: [Int] -> [[Int]]
+initGrid = map (\x -> x:[1..9])
 
 convertString :: [Char] -> [Int]
 convertString = map digitToInt
@@ -14,7 +14,7 @@ gridNumbers :: [[Int]] -> [Int]
 gridNumbers pg = map head pg
 
 readPuzzle :: [Char] -> [[Int]] 
-readPuzzle = (initGrid 1) . convertString
+readPuzzle = initGrid  . convertString
 
 isSolved :: [[Int]] -> Bool
 isSolved pg = all (>0) $ gridNumbers pg
