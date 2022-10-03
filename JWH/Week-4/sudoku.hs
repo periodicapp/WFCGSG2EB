@@ -16,6 +16,9 @@ gridNumbers pg = map head pg
 readPuzzle :: [Char] -> [[Int]] 
 readPuzzle = (initGrid 1) . convertString
 
+isSolved :: [[Int]] -> Bool
+isSolved pg = all (>0) $ gridNumbers pg
+
 chunksOf :: Int -> [a] -> [[a]]
 chunksOf _ [] = []
 chunksOf n ls 
@@ -136,6 +139,7 @@ main =
     print $ getIndexFromCoordinates (6,7)
     print $ getCoordinatesFromIndex 60
     print $ getIndexFromCoordinates (6,6)
+    print $ isSolved $ readPuzzle $ ((!!0) . lines) input
     --print $ ((flip getColumn) 0) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
     --print $ ((flip getColumn) 1) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
     --print $ ((flip getColumn) 2) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
