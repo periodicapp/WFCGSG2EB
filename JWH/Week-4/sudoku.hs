@@ -50,31 +50,20 @@ getIndexesForRow i
   | i >= 0 && i < 81 && i `mod` 9 == 0 = [i..(i+8)]
   | otherwise = []
 
+getIndexesForColumn :: Int -> [Int]
+getIndexesForColumn i
+  | i >= 0 && i < 9 = [i,(i+9)..80]
+  | otherwise = []
 
 getRow :: [Int] -> Int -> [Int]
 getRow grd i = getItemsAtIndexes grd (getIndexesForRow (i*9))
---getRow grd i = gtrw grd ((i*9)-1) 0 
---  where 
---    gtrw (r:rw) j c
---        | j < 0 || j > 81 = take 9 (r:rw)
---        | c > 81 || c < 0 = []
---        | c == j = take 9 $ rw
---        | otherwise = gtrw rw j (c+1)
 
 getColumn :: [Int] -> Int -> [Int]
-getColumn grd i = gtcl grd i 0
-  where
-    gtcl (c:cl) j k
-      | j < 0 = gtcl grd 0 0
-      | j > 80 = []
-      | k > 80 || k < 0 = []
-      | k == j = c : (gtcl cl (j+9) (k+1))
-      | otherwise = gtcl cl j (k+1)
+getColumn grd i = getItemsAtIndexes grd (getIndexesForColumn i)
 
 getGrid' :: [Int] -> (Int,Int) -> Int -> [Int]
 getGrid' grd (rowoffset,columnoffset) limit
   | rowoffset < limit = (((take 3) . (drop columnoffset) . (getRow grd)) $ rowoffset) ++ (getGrid' grd ((rowoffset+1),columnoffset) limit)
---  | rowoffset < limit = [rowoffset+1]
   | otherwise = []
   
 getGrid :: [Int] -> (Int,Int) -> [Int]
@@ -97,9 +86,16 @@ main =
     putStr $ printGrid $ readPuzzle $ ((!!0) . lines) input
     print $ ((flip getRow) 0) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
     --print $ ((flip getItemsAtIndexes) (getIndexesForRow 0)) $ readPuzzle $ ((!!0) . lines) input
-    --print $ getIndexesForRow 0
-    print $ ((flip getColumn) 7) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
     print $ (flip getGrid (0,0)) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
     print $ (flip getItemsAtIndexes [0,4,8,9]) $ readPuzzle $ ((!!0) . lines) input
+    print $ ((flip getColumn) 0) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
+    print $ ((flip getColumn) 1) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
+    print $ ((flip getColumn) 2) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
+    print $ ((flip getColumn) 3) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
+    print $ ((flip getColumn) 4) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
+    print $ ((flip getColumn) 5) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
+    print $ ((flip getColumn) 6) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
+    print $ ((flip getColumn) 7) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
+    print $ ((flip getColumn) 8) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
     --print $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
     --print $ readPuzzle $ ((!!0) . lines) input
