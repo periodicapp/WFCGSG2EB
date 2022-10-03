@@ -64,6 +64,9 @@ getColumn grd i = getItemsAtIndexes grd (getIndexesForColumn i)
 getCoordinatesFromIndex :: Int -> (Int,Int)
 getCoordinatesFromIndex i = (i `div` 9, i `mod` 9)
 
+getIndexFromCoordinates :: (Int,Int) -> Int
+getIndexFromCoordinates (i,j) = (i*9) + j
+
 getGrid' :: [Int] -> (Int,Int) -> Int -> [Int]
 getGrid' grd (rowoffset,columnoffset) limit
   | rowoffset < limit = (((take 3) . (drop columnoffset) . (getRow grd)) $ rowoffset) ++ (getGrid' grd ((rowoffset+1),columnoffset) limit)
@@ -91,27 +94,48 @@ main =
     --print $ ((flip getItemsAtIndexes) (getIndexesForRow 0)) $ readPuzzle $ ((!!0) . lines) input
     print $ (flip getGrid (0,0)) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
     print $ (flip getItemsAtIndexes [0,4,8,9]) $ readPuzzle $ ((!!0) . lines) input
-    --print $ getCoordinatesFromIndex 80
-    --print $ getCoordinatesFromIndex 79
-    --print $ getCoordinatesFromIndex 78
-    --print $ getCoordinatesFromIndex 77
-    --print $ getCoordinatesFromIndex 76
-    --print $ getCoordinatesFromIndex 75
-    --print $ getCoordinatesFromIndex 74
-    --print $ getCoordinatesFromIndex 73
-    --print $ getCoordinatesFromIndex 72
-    --print $ getCoordinatesFromIndex 71
-    --print $ getCoordinatesFromIndex 70
-    --print $ getCoordinatesFromIndex 69
-    --print $ getCoordinatesFromIndex 68
-    --print $ getCoordinatesFromIndex 67
-    --print $ getCoordinatesFromIndex 66
-    --print $ getCoordinatesFromIndex 65
-    --print $ getCoordinatesFromIndex 64
-    --print $ getCoordinatesFromIndex 63
-    --print $ getCoordinatesFromIndex 62
-    --print $ getCoordinatesFromIndex 61
-    --print $ getCoordinatesFromIndex 60
+    print $ getCoordinatesFromIndex 80
+    print $ getIndexFromCoordinates (8,8)
+    print $ getCoordinatesFromIndex 79
+    print $ getIndexFromCoordinates (8,7)
+    print $ getCoordinatesFromIndex 78
+    print $ getIndexFromCoordinates (8,6)
+    print $ getCoordinatesFromIndex 77
+    print $ getIndexFromCoordinates (8,5)
+    print $ getCoordinatesFromIndex 76
+    print $ getIndexFromCoordinates (8,4)
+    print $ getCoordinatesFromIndex 75
+    print $ getIndexFromCoordinates (8,3)
+    print $ getCoordinatesFromIndex 74
+    print $ getIndexFromCoordinates (8,2)
+    print $ getCoordinatesFromIndex 73
+    print $ getIndexFromCoordinates (8,1)
+    print $ getCoordinatesFromIndex 72
+    print $ getIndexFromCoordinates (8,0)
+    print $ getCoordinatesFromIndex 71
+    print $ getIndexFromCoordinates (7,8)
+    print $ getCoordinatesFromIndex 70
+    print $ getIndexFromCoordinates (7,7)
+    print $ getCoordinatesFromIndex 69
+    print $ getIndexFromCoordinates (7,6)
+    print $ getCoordinatesFromIndex 68
+    print $ getIndexFromCoordinates (7,5)
+    print $ getCoordinatesFromIndex 67
+    print $ getIndexFromCoordinates (7,4)
+    print $ getCoordinatesFromIndex 66
+    print $ getIndexFromCoordinates (7,3)
+    print $ getCoordinatesFromIndex 65
+    print $ getIndexFromCoordinates (7,2)
+    print $ getCoordinatesFromIndex 64
+    print $ getIndexFromCoordinates (7,1)
+    print $ getCoordinatesFromIndex 63
+    print $ getIndexFromCoordinates (7,0)
+    print $ getCoordinatesFromIndex 62
+    print $ getIndexFromCoordinates (6,8)
+    print $ getCoordinatesFromIndex 61
+    print $ getIndexFromCoordinates (6,7)
+    print $ getCoordinatesFromIndex 60
+    print $ getIndexFromCoordinates (6,6)
     --print $ ((flip getColumn) 0) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
     --print $ ((flip getColumn) 1) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
     --print $ ((flip getColumn) 2) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
