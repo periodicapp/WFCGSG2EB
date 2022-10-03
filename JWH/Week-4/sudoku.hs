@@ -52,7 +52,7 @@ getIndexesForRow i
 
 
 getRow :: [Int] -> Int -> [Int]
-getRow grd i = getItemsAtIndexes grd (getIndexesForRow i)
+getRow grd i = getItemsAtIndexes grd (getIndexesForRow (i*9))
 --getRow grd i = gtrw grd ((i*9)-1) 0 
 --  where 
 --    gtrw (r:rw) j c
@@ -73,7 +73,8 @@ getColumn grd i = gtcl grd i 0
 
 getGrid' :: [Int] -> (Int,Int) -> Int -> [Int]
 getGrid' grd (rowoffset,columnoffset) limit
-  | rowoffset < limit = (((take 3) . (drop columnoffset) . (getRow grd)) $ rowoffset) ++ (getGrid' grd (rowoffset+1,columnoffset) limit)
+  | rowoffset < limit = (((take 3) . (drop columnoffset) . (getRow grd)) $ rowoffset) ++ (getGrid' grd ((rowoffset+1),columnoffset) limit)
+--  | rowoffset < limit = [rowoffset+1]
   | otherwise = []
   
 getGrid :: [Int] -> (Int,Int) -> [Int]
@@ -96,9 +97,9 @@ main =
     putStr $ printGrid $ readPuzzle $ ((!!0) . lines) input
     print $ ((flip getRow) 0) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
     --print $ ((flip getItemsAtIndexes) (getIndexesForRow 0)) $ readPuzzle $ ((!!0) . lines) input
-    print $ getIndexesForRow 0
-    print $ ((flip getColumn) 0) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
+    --print $ getIndexesForRow 0
+    print $ ((flip getColumn) 7) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
     print $ (flip getGrid (0,0)) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
-    print $ (flip getItemsAtIndexes [0,4,8]) $ readPuzzle $ ((!!0) . lines) input
+    print $ (flip getItemsAtIndexes [0,4,8,9]) $ readPuzzle $ ((!!0) . lines) input
     --print $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
     --print $ readPuzzle $ ((!!0) . lines) input
