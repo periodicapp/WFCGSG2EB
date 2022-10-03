@@ -7,14 +7,58 @@ import Data.List (intersperse)
 initGrid :: [Int] -> [[Int]]
 initGrid = map (\x -> x:[1..9])
 
+--removeItem takes an item and a list and removes the item from the list
+removeItem :: Int -> [Int] -> [Int]
+removeItem _ [] = []
+removeItem x (y:ys) 
+  | x == y = removeItem x ys
+  | otherwise = y : removeItem x ys
+
+--removePossibility takes an integer representing a value for a cell that is no
+--longer possible for that cell and removes it from the list of possibilities.
+--Because the representation used is a list of at most 10 - with the head
+--representing the current value of the cell and the tail representing the
+--remaining possible values (when the cell hasn't been solved) - we do this by
+--concatenating the existing head onto the result of removing the value from
+--the tail
+removePossibility :: Int -> [Int] -> [Int]
+removePossibility i (x:xs) = x : removeItem i xs
+
+--clearSolvedCell takes list of Int representing a cell and, if the cell is
+--"solved" (that is, it has a current value other than 0), removes the tail.
+--This is because we use the head of the list to represent the current value
+--and the tail to represent remaining possibilities.  Once the cell is solved,
+--there is no need to keep track of remaining possibilities.  Cell
+--representations of length 1 mean "solved."
+clearSolvedCell :: [Int] -> [Int]
+clearSolvedCell (x:xs) 
+  | x /= 0 = [x]
+  | otherwise = (x:xs)
+
+--solveCell detects whether a cell has been solved and, if so, marks it as
+--solved.  A cell is "solved" when it is an array of length 2: the first member
+--being the current value of the cell and the second being the remaining
+--possibilities.  (If there is only one possibility, the cell is solved.)  Mark
+--the cell as solved by replacing the head value (i.e. the current value) with
+--the second value (i.e. the remaining possibility).
+solveCell :: [Int] -> [Int]
+solveCell cl
+  | (length cl) == 2 = [cl !! 1, cl !! 1] 
+  | otherwise = cl
+
 convertString :: [Char] -> [Int]
 convertString = map digitToInt
 
+--gridNumbers takes a "grid" - represented as a list of lists of Int (one list
+--for each cell in the puzzle grid) and returns only the heads of each list.
+--This is beacuse we're using the head of each member list to represent the
+--value of the cell and the tail of each member list to hold the remaining
+--possible values for the cell
 gridNumbers :: [[Int]] -> [Int]
 gridNumbers pg = map head pg
 
 readPuzzle :: [Char] -> [[Int]] 
-readPuzzle = initGrid  . convertString
+readPuzzle = (map clearSolvedCell) . initGrid  . convertString
 
 isSolved :: [[Int]] -> Bool
 isSolved pg = all (>0) $ gridNumbers pg
@@ -91,7 +135,9 @@ main =
     --print $ getIndexesForGrid (8,8)
     --mapM (putStr . printGrid . readPuzzle) $ lines $ input
     --print $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
+    --print $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
     putStr $ printGrid $ readPuzzle $ ((!!0) . lines) input
+    print $ readPuzzle $ ((!!0) . lines) input
     --print $ ((flip getRow) 0) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
     --print $ ((flip getItemsAtIndexes) (getIndexesForRow 0)) $ readPuzzle $ ((!!0) . lines) input
     --print $ (flip getGrid (0,0)) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
