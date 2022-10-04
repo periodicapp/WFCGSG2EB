@@ -129,8 +129,8 @@ removePossibilityFromCells (cell:cells) indexes current value
   | otherwise = cell : removePossibilityFromCells cells indexes (current+1) value
   
 
-eliminateForSolvedCell :: [[Int]] -> (Int,Int) -> [[Int]]
-eliminateForSolvedCell pg (value, index) =
+eliminateForSolvedCell :: (Int,Int) -> [[Int]] -> [[Int]]
+eliminateForSolvedCell (value, index) pg  =
   let
     peerIndexes = getIndexesForPeers (getCoordinatesFromIndex index)
   in
@@ -141,7 +141,7 @@ eliminateForSolvedCells pg =
   let
     solvedindexes = getSolvedIndexes pg
   in
-    foldr (flip eliminateForSolvedCell) pg solvedindexes
+    foldr eliminateForSolvedCell pg solvedindexes
 
 --NEXT: getIndexesForPeers, removeFromPeers
 
@@ -175,30 +175,13 @@ main =
     putStrLn "\n\n"
     print $ puzzle
     putStrLn "\n\n"
-    print $ eliminateForSolvedCell puzzle (8,29)
+    --print $ eliminateForSolvedCell puzzle (8,29)
     putStrLn "\n\n"
-    print $ eliminateForSolvedCells puzzle
-    putStrLn "\n\n"
-    print $ (eliminateForSolvedCells . markSolvedCells) $ eliminateForSolvedCells puzzle
-    putStrLn "\n\n"
-    print $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ eliminateForSolvedCells puzzle
-    putStrLn "\n\n"
-    print $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ eliminateForSolvedCells puzzle
-    putStrLn "\n\n"
-    print $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ eliminateForSolvedCells puzzle
-    putStrLn "\n\n"
-    print $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ eliminateForSolvedCells puzzle
-    putStrLn "\n\n"
-    print $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ eliminateForSolvedCells puzzle
-    putStrLn "\n\n"
-    print $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ eliminateForSolvedCells puzzle
-    putStrLn "\n\n"
-    print $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ eliminateForSolvedCells puzzle
-    putStrLn "\n\n"
-    print $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ eliminateForSolvedCells puzzle
-    putStrLn "\n\n"
-    putStrLn $ printGrid $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ eliminateForSolvedCells puzzle
-    --print $ getIndexesForGrid (8,8)
+    putStrLn $ printGrid $ iterate (eliminateForSolvedCells . markSolvedCells) puzzle !! 8
+    putStrLn $ printGrid $ iterate (eliminateForSolvedCells . markSolvedCells) puzzle !! 9
+    putStrLn $ printGrid $ iterate (eliminateForSolvedCells . markSolvedCells) puzzle !! 10
+    putStrLn $ printGrid $ iterate (eliminateForSolvedCells . markSolvedCells) puzzle !! 11
+    print $ (iterate (eliminateForSolvedCells . markSolvedCells) puzzle !! 11) == (iterate (eliminateForSolvedCells . markSolvedCells) puzzle !! 10)
     --mapM (putStr . printGrid . readPuzzle) $ lines $ input
     --print $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
     --print $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
