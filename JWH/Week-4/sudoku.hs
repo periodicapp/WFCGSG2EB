@@ -43,8 +43,11 @@ clearSolvedCell (x:xs)
 --the second value (i.e. the remaining possibility).
 solveCell :: [Int] -> [Int]
 solveCell cl
-  | (length cl) == 2 = [cl !! 1, cl !! 1] 
+  | (length cl) == 2 = [cl !! 1]
   | otherwise = cl
+
+markSolvedCells :: [[Int]] -> [[Int]]
+markSolvedCells = map solveCell
 
 convertString :: [Char] -> [Int]
 convertString = map digitToInt
@@ -111,13 +114,7 @@ getIndexesForGrid (row,column) =
     [x | rw <- [0,1,2], x <- (take 3) . (drop columnoffset) . getIndexesForRow $ ((rw+rowoffset)*9)]
 
 getIndexesForPeers :: (Int,Int) -> [Int]
-getIndexesForPeers (row,column) =
-  let
-    rowIndexes = getIndexesForRow (row*9)
-    columnIndexes = getIndexesForColumn column
-    gridIndexes = getIndexesForGrid (row,column)
-  in
-    rowIndexes ++ columnIndexes ++ gridIndexes
+getIndexesForPeers (row,column) = (getIndexesForRow (row*9)) ++ (getIndexesForColumn column) ++ (getIndexesForGrid (row,column))
 
 getSolvedIndexes :: [[Int]] -> [(Int,Int)]
 getSolvedIndexes pg = gsi 0 pg
@@ -125,7 +122,31 @@ getSolvedIndexes pg = gsi 0 pg
    gsi n [] = []
    gsi n (x:xs) = if (length x) == 1 then (head x,n) : gsi (n+1) xs else gsi (n+1) xs
 
+removePossibilityFromCells :: [[Int]] -> [Int] -> Int -> Int -> [[Int]]
+removePossibilityFromCells [] _ _ _ = []
+removePossibilityFromCells (cell:cells) indexes current value
+  | current `elem` indexes = (removePossibility value cell) : (removePossibilityFromCells cells indexes (current+1) value)
+  | otherwise = cell : removePossibilityFromCells cells indexes (current+1) value
+  
+
+eliminateForSolvedCell :: [[Int]] -> (Int,Int) -> [[Int]]
+eliminateForSolvedCell pg (value, index) =
+  let
+    peerIndexes = getIndexesForPeers (getCoordinatesFromIndex index)
+  in
+    removePossibilityFromCells pg peerIndexes 0 value
+
+eliminateForSolvedCells :: [[Int]] -> [[Int]]
+eliminateForSolvedCells pg =
+  let
+    solvedindexes = getSolvedIndexes pg
+  in
+    foldr (flip eliminateForSolvedCell) pg solvedindexes
+
 --NEXT: getIndexesForPeers, removeFromPeers
+
+applyStrategy :: ([[Int]] -> [[Int]]) -> [[Int]] -> [[Int]]
+applyStrategy strategy pg = strategy pg
 
 getRow :: [Int] -> Int -> [Int]
 getRow grd i = getItemsAtIndexes grd (getIndexesForRow (i*9))
@@ -149,14 +170,42 @@ printGrid = (foldr (++) "") . renderGridLine . gridNumbers
 main = 
   do
     input <- readFile "easy50.txt"
+    let puzzle = readPuzzle $ ((!!0) . lines) input
+    putStr $ printGrid puzzle
+    putStrLn "\n\n"
+    print $ puzzle
+    putStrLn "\n\n"
+    print $ eliminateForSolvedCell puzzle (8,29)
+    putStrLn "\n\n"
+    print $ eliminateForSolvedCells puzzle
+    putStrLn "\n\n"
+    print $ (eliminateForSolvedCells . markSolvedCells) $ eliminateForSolvedCells puzzle
+    putStrLn "\n\n"
+    print $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ eliminateForSolvedCells puzzle
+    putStrLn "\n\n"
+    print $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ eliminateForSolvedCells puzzle
+    putStrLn "\n\n"
+    print $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ eliminateForSolvedCells puzzle
+    putStrLn "\n\n"
+    print $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ eliminateForSolvedCells puzzle
+    putStrLn "\n\n"
+    print $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ eliminateForSolvedCells puzzle
+    putStrLn "\n\n"
+    print $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ eliminateForSolvedCells puzzle
+    putStrLn "\n\n"
+    print $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ eliminateForSolvedCells puzzle
+    putStrLn "\n\n"
+    print $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ eliminateForSolvedCells puzzle
+    putStrLn "\n\n"
+    putStrLn $ printGrid $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ (eliminateForSolvedCells . markSolvedCells) $ eliminateForSolvedCells puzzle
     --print $ getIndexesForGrid (8,8)
     --mapM (putStr . printGrid . readPuzzle) $ lines $ input
     --print $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
     --print $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
-    putStr $ printGrid $ readPuzzle $ ((!!0) . lines) input
-    print $ readPuzzle $ ((!!0) . lines) input
-    print $ getSolvedIndexes $ readPuzzle $ ((!!0) . lines) input
-    print $ getIndexesForPeers (2,6) 
+    --putStr $ printGrid $ readPuzzle $ ((!!0) . lines) input
+    --print $ readPuzzle $ ((!!0) . lines) input
+    --print $ getSolvedIndexes $ readPuzzle $ ((!!0) . lines) input
+    --print $ getIndexesForPeers (2,6) 
     --print $ ((flip getRow) 0) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
     --print $ ((flip getItemsAtIndexes) (getIndexesForRow 0)) $ readPuzzle $ ((!!0) . lines) input
     --print $ (flip getGrid (0,0)) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
