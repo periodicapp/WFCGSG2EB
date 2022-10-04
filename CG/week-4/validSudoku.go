@@ -40,8 +40,12 @@ func main() {
 	fmt.Println("########################")
 	fmt.Println("## CHECK VALID SUDOKU ##")
 	fmt.Println("########################")
-	fmt.Println("Board 1 (see code)", isValidSudoku(board1))
-	fmt.Println("Board 2 (see code)", isValidSudoku(board2))
+	fmt.Println()
+	fmt.Println("######### BOARD 1 #########", isValidSudoku(board1))
+	printBoard(board1)
+	fmt.Println()
+	fmt.Println("######### BOARD 2 #########", isValidSudoku(board2))
+	printBoard(board2)
 	fmt.Println()
 }
 
@@ -108,4 +112,13 @@ func check(candidate []byte) bool {
 			}
 	}
 	return true
+}
+
+func printBoard(board [][]byte) {
+	for _, row := range board {
+		for j, _ := range row {
+			fmt.Printf(" %s ", string(row[j]))
+		}
+		fmt.Println()
+	}
 }
