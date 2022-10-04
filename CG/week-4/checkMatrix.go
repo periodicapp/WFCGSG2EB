@@ -5,6 +5,11 @@ import(
 )
 
 // https://leetcode.com/problems/check-if-every-row-and-column-contains-all-numbers/
+/*
+	#### LEETCODE RESULTS ####
+	Runtime: 311 ms, faster than 18.18% of Go online submissions for Check if Every Row and Column Contains All Numbers.
+	Memory Usage: 8.2 MB, less than 54.55% of Go online submissions for Check if Every Row and Column Contains All Numbers.
+*/
 func main() {
 	test1 := [][]int{
 		{1, 2, 3},
