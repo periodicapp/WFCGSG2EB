@@ -110,6 +110,23 @@ getIndexesForGrid (row,column) =
   in
     [x | rw <- [0,1,2], x <- (take 3) . (drop columnoffset) . getIndexesForRow $ ((rw+rowoffset)*9)]
 
+getIndexesForPeers :: (Int,Int) -> [Int]
+getIndexesForPeers (row,column) =
+  let
+    rowIndexes = getIndexesForRow (row*9)
+    columnIndexes = getIndexesForColumn column
+    gridIndexes = getIndexesForGrid (row,column)
+  in
+    rowIndexes ++ columnIndexes ++ gridIndexes
+
+getSolvedIndexes :: [[Int]] -> [(Int,Int)]
+getSolvedIndexes pg = gsi 0 pg
+  where
+   gsi n [] = []
+   gsi n (x:xs) = if (length x) == 1 then (head x,n) : gsi (n+1) xs else gsi (n+1) xs
+
+--NEXT: getIndexesForPeers, removeFromPeers
+
 getRow :: [Int] -> Int -> [Int]
 getRow grd i = getItemsAtIndexes grd (getIndexesForRow (i*9))
 
@@ -138,6 +155,8 @@ main =
     --print $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
     putStr $ printGrid $ readPuzzle $ ((!!0) . lines) input
     print $ readPuzzle $ ((!!0) . lines) input
+    print $ getSolvedIndexes $ readPuzzle $ ((!!0) . lines) input
+    print $ getIndexesForPeers (2,6) 
     --print $ ((flip getRow) 0) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
     --print $ ((flip getItemsAtIndexes) (getIndexesForRow 0)) $ readPuzzle $ ((!!0) . lines) input
     --print $ (flip getGrid (0,0)) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
