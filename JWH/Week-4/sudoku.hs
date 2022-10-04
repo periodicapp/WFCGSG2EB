@@ -143,7 +143,15 @@ eliminateForSolvedCells pg =
   in
     foldr eliminateForSolvedCell pg solvedindexes
 
---NEXT: getIndexesForPeers, removeFromPeers
+iterateUntilEqual :: (Eq a) => (a -> a) -> a -> a
+iterateUntilEqual f i =
+  let
+    intermediate = f i
+  in 
+    if intermediate == i then intermediate else iterateUntilEqual f intermediate
+
+eliminateForSolvedCellsStrategy :: [[Int]] -> [[Int]]
+eliminateForSolvedCellsStrategy pg = iterateUntilEqual (eliminateForSolvedCells . markSolvedCells) pg
 
 applyStrategy :: ([[Int]] -> [[Int]]) -> [[Int]] -> [[Int]]
 applyStrategy strategy pg = strategy pg
@@ -177,11 +185,12 @@ main =
     putStrLn "\n\n"
     --print $ eliminateForSolvedCell puzzle (8,29)
     putStrLn "\n\n"
-    putStrLn $ printGrid $ iterate (eliminateForSolvedCells . markSolvedCells) puzzle !! 8
-    putStrLn $ printGrid $ iterate (eliminateForSolvedCells . markSolvedCells) puzzle !! 9
-    putStrLn $ printGrid $ iterate (eliminateForSolvedCells . markSolvedCells) puzzle !! 10
-    putStrLn $ printGrid $ iterate (eliminateForSolvedCells . markSolvedCells) puzzle !! 11
-    print $ (iterate (eliminateForSolvedCells . markSolvedCells) puzzle !! 11) == (iterate (eliminateForSolvedCells . markSolvedCells) puzzle !! 10)
+    --putStrLn $ printGrid $ iterate (eliminateForSolvedCells . markSolvedCells) puzzle !! 8
+    --putStrLn $ printGrid $ iterate (eliminateForSolvedCells . markSolvedCells) puzzle !! 9
+    --putStrLn $ printGrid $ iterate (eliminateForSolvedCells . markSolvedCells) puzzle !! 10
+    --putStrLn $ printGrid $ iterate (eliminateForSolvedCells . markSolvedCells) puzzle !! 11
+    --print $ (iterate (eliminateForSolvedCells . markSolvedCells) puzzle !! 11) == (iterate (eliminateForSolvedCells . markSolvedCells) puzzle !! 10)
+    putStrLn $ printGrid $ eliminateForSolvedCellsStrategy puzzle
     --mapM (putStr . printGrid . readPuzzle) $ lines $ input
     --print $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
     --print $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
