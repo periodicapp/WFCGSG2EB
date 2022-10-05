@@ -157,7 +157,12 @@ eliminateForSolvedCells pg =
     foldr eliminateForSolvedCell pg solvedindexes
 
 eliminateForLastRemainingInBox :: [[Int]] -> [[Int]]
-eliminateForLastRemainingInBox pg = pg
+eliminateForLastRemainingInBox pg =
+  let
+    possiblecellsbynumber = getPossibleCellsForNumbers pg
+    cellsbybox = map getIndexesForBoxNumber [0..8]
+  in
+    cellsbybox
 
 iterateUntilEqual :: (Eq a) => (a -> a) -> a -> a
 iterateUntilEqual f i =
@@ -209,6 +214,7 @@ main =
     print $ getIndexedCells $ puzzles !! 2
     print $ (getPossibleCellsForNumber 9) . getIndexedCells $ puzzles !! 2
     print $ getPossibleCellsForNumbers $ puzzles !! 2
+    print $ map getIndexesForBoxNumber [0..8]
     --let puzzle = readPuzzle $ ((!!2) . lines) input
     --mapM solveAndShow $ puzzles 
     --mapM (print . getIndexesForBoxNumber) [0..9]
