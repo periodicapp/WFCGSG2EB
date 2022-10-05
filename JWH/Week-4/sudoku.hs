@@ -144,36 +144,65 @@ getIndexesForColumn i
   | i >= 0 && i < 9 = [i,(i+9)..80]
   | otherwise = []
 
-getIndexesForGrid :: (Int,Int) -> [Int]
-getIndexesForGrid (row,column) =
+--getIndexesForBox - given a 0-indexed (row,column) tuple, return the indexes
+--of all the cells in the one-dimensional array reprentation of the puzzle that
+--fall within that box
+getIndexesForBox :: (Int,Int) -> [Int]
+getIndexesForBox (row,column) =
   let
     rowoffset = (row `div` 3) * 3
     columnoffset = (column `div` 3) * 3
   in
     [x | rw <- [0,1,2], x <- (take 3) . (drop columnoffset) . getIndexesForRow $ ((rw+rowoffset)*9)]
 
+--getIndexesForBoxNumber - given a number for a box (assuming we number boxes
+--from 0 to 8 reading left-to-right and across from the top-left box to the
+--bottom-right one) - return the indexes for all the cells in the
+--one-dimensional array representation of the puzzle that fall within that box
 getIndexesForBoxNumber :: Int -> [Int]
-getIndexesForBoxNumber n = getIndexesForGrid ((n `div` 3) * 3, (n `mod` 3) * 3)
+getIndexesForBoxNumber n = getIndexesForBox ((n `div` 3) * 3, (n `mod` 3) * 3)
 
+--given a 0-indexed (row,column) tuple representing a cell, return the indexes
+--of all the cells in the one-dimensional array representation of the puzzle
+--that are in the same row, column, or box as that cell.  Note that this
+--currently returns duplicates for overlap cells.
 getIndexesForPeers :: (Int,Int) -> [Int]
-getIndexesForPeers (row,column) = (getIndexesForRow (row*9)) ++ (getIndexesForColumn column) ++ (getIndexesForGrid (row,column))
+getIndexesForPeers (row,column) = (getIndexesForRow (row*9)) ++ (getIndexesForColumn column) ++ (getIndexesForBox (row,column))
 
+--getSolvedIndexes - given a one-dimensional array puzzle representation,
+--return the indexes in the array of all the cells that are "solved" (in the
+--sense of being length one arrays, with the one position representing the
+--value of the cell; there are no more possible values to represent)
 getSolvedIndexes :: [[Int]] -> [(Int,Int)]
 getSolvedIndexes pg = gsi 0 pg
   where
    gsi n [] = []
    gsi n (x:xs) = if (length x) == 1 then (head x,n) : gsi (n+1) xs else gsi (n+1) xs
 
+
+--getIndexedCells - given a one-dimensional array representation of a puzzle,
+--return an array of each cell representation paired in a tuple with its index
 getIndexedCells :: [[Int]] -> [(Int,[Int])]
 getIndexedCells = zip [0..]
 
+--getPossibleCellsForNumber - given a number (1-9) and a "getIndexedCells"
+--representation of the puzzle, return all the cells for which that number is a
+--possible value (in the sense of being in the tail of the representation [Int]
+--list for that cell)
 getPossibleCellsForNumber :: Int -> [(Int,[Int])] -> [Int]
 getPossibleCellsForNumber _ [] = []
 getPossibleCellsForNumber n ((i,possibilities):rest) = if n `elem` possibilities then i : getPossibleCellsForNumber n rest else getPossibleCellsForNumber n rest 
 
+--getPossibleCellsForNumbers - takes a one-dimensional array representation of
+--a puzzles and calls "getPossibleCellsForNumber" on it for each number 1-9 -
+--i.e. for each possible value of a cell.
 getPossibleCellsForNumbers :: [[Int]] -> [[Int]]
 getPossibleCellsForNumbers pg = map ((flip getPossibleCellsForNumber) (getIndexedCells pg)) [1..9]
 
+--removePossibilityFromCells - given an array-of-cells representation of a
+--puzzle and a list of indexes of cells to affect, and a value to remove,
+--remove the value from each of the cells indicated by the indexes, returning
+--the modified array-of-cells representation of the puzzle
 removePossibilityFromCells :: [[Int]] -> [Int] -> Int -> Int -> [[Int]]
 removePossibilityFromCells [] _ _ _ = []
 removePossibilityFromCells (cell:cells) indexes current value
@@ -181,6 +210,11 @@ removePossibilityFromCells (cell:cells) indexes current value
   | otherwise = cell : removePossibilityFromCells cells indexes (current+1) value
   
 
+--eliminateForSolvedCell - once a cell is "solved," no other cells in its row,
+--column or box can share a value with it.  So, given a (row,column)
+--representation of a cell, remove the value from the possibilities list of all
+--of its "peers" - that is, from all the cells in the same column, row or box
+--with it.
 eliminateForSolvedCell :: (Int,Int) -> [[Int]] -> [[Int]]
 eliminateForSolvedCell (value, index) pg  =
   let
@@ -188,6 +222,11 @@ eliminateForSolvedCell (value, index) pg  =
   in
     removePossibilityFromCells pg peerIndexes 0 value
 
+--eliminateForSolvedCell - given an array-of-cells representation of a puzzle,
+--identify all the cells that are "solved" and call "eleminateSolvedCell" for
+--each, making sure that values for each solved cell are removed from the
+--possibilities for each of their row, column and box neighbors.  This is a
+--"strategy" function.
 eliminateForSolvedCells :: [[Int]] -> [[Int]]
 eliminateForSolvedCells pg =
   let
@@ -203,6 +242,11 @@ eliminateForLastRemainingInBox pg =
   in
     cellsbybox
 
+
+--iterateUntilEqual - is a way of running the same strategy function over a
+--puzzle as long as "needed."  It is used to run the strategy function over the
+--puzzle, returning a new representation of the puzzle, which it then feeds
+--back to the same function repeatedly until the output stops changing
 iterateUntilEqual :: (Eq a) => (a -> a) -> a -> a
 iterateUntilEqual f i =
   let
@@ -226,18 +270,22 @@ getColumn :: [Int] -> Int -> [Int]
 getColumn grd i = getItemsAtIndexes grd (getIndexesForColumn i)
 
 getGrid :: [Int] -> (Int,Int) -> [Int]
-getGrid grd (row,column) = getItemsAtIndexes grd (getIndexesForGrid (row,column))
+getGrid grd (row,column) = getItemsAtIndexes grd (getIndexesForBox (row,column))
     
+--getCoordinatesFromIndex - given the index of a cell in an array-of-cells
+--representation of a puzzle, return the (row,column) tuple for that cell
 getCoordinatesFromIndex :: Int -> (Int,Int)
 getCoordinatesFromIndex i = (i `div` 9, i `mod` 9)
 
+--getIndexFromCoordinates - given the (row,column) representation of a cell in
+--a puzzle, return the index in the array-of-cells representation it
+--corresponds to
 getIndexFromCoordinates :: (Int,Int) -> Int
 getIndexFromCoordinates (i,j) = (i*9) + j
 
 printGrid :: [[Int]] -> [Char]
 printGrid = (foldr (++) "") . renderGridLine . gridNumbers
 
-  
 solveAndShow :: [[Int]] -> IO ()
 solveAndShow pz = do
   putStrLn . printGrid $ pz
