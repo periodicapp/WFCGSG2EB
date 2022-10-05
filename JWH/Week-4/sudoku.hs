@@ -128,6 +128,13 @@ getSolvedIndexes pg = gsi 0 pg
 getIndexedCells :: [[Int]] -> [(Int,[Int])]
 getIndexedCells = zip [0..]
 
+getPossibleCellsForNumber :: Int -> [(Int,[Int])] -> [Int]
+getPossibleCellsForNumber _ [] = []
+getPossibleCellsForNumber n ((i,possibilities):rest) = if n `elem` possibilities then i : getPossibleCellsForNumber n rest else getPossibleCellsForNumber n rest 
+
+getPossibleCellsForNumbers :: [[Int]] -> [[Int]]
+getPossibleCellsForNumbers pg = map ((flip getPossibleCellsForNumber) (getIndexedCells pg)) [1..9]
+
 removePossibilityFromCells :: [[Int]] -> [Int] -> Int -> Int -> [[Int]]
 removePossibilityFromCells [] _ _ _ = []
 removePossibilityFromCells (cell:cells) indexes current value
@@ -200,6 +207,8 @@ main =
     let puzzles = map readPuzzle $ lines input
     putStrLn $ printGrid $ puzzles !! 2
     print $ getIndexedCells $ puzzles !! 2
+    print $ (getPossibleCellsForNumber 9) . getIndexedCells $ puzzles !! 2
+    print $ getPossibleCellsForNumbers $ puzzles !! 2
     --let puzzle = readPuzzle $ ((!!2) . lines) input
     --mapM solveAndShow $ puzzles 
     --mapM (print . getIndexesForBoxNumber) [0..9]
