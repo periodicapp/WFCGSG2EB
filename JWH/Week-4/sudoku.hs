@@ -264,36 +264,24 @@ eliminateForSolvedCells pg =
 getSingleOptionNumbers :: [[Int]] -> [(Int,Int)]
 getSingleOptionNumbers cells = [(num,head idx) | (num,idx) <- (zip [1..] cells), length idx == 1]
 
---eliminateForLastRemainingInBox :: [[Int]] -> [(Int,Int)]
-eliminateForLastRemainingInBox :: Int -> [[Int]] -> [[Int]]
-eliminateForLastRemainingInBox n pg =
+eliminateForLastRemainingInUnit :: (Int -> [Int]) -> Int -> [[Int]] -> [[Int]]
+eliminateForLastRemainingInUnit f n pg = 
   let
     possiblecellsbynumber = getPossibleCellsForNumbers pg
-    cellsbybox = getIndexesForBoxNumber n
+    cellsbybox = f n
     overlap = map (intersection cellsbybox) possiblecellsbynumber
     relevant = getSingleOptionNumbers overlap
   in
     foldr solveCellForNumberAtIndexTuple pg relevant
 
+eliminateForLastRemainingInBox :: Int -> [[Int]] -> [[Int]]
+eliminateForLastRemainingInBox = eliminateForLastRemainingInUnit getIndexesForBoxNumber
+
 eliminateForLastRemainingInRow :: Int -> [[Int]] -> [[Int]]
-eliminateForLastRemainingInRow n pg = 
-  let
-    possiblecellsbynumber = getPossibleCellsForNumbers pg
-    cellsbyrow = getIndexesForRow (n*9)
-    overlap = map (intersection cellsbyrow) possiblecellsbynumber
-    relevant = getSingleOptionNumbers overlap
-  in
-    foldr solveCellForNumberAtIndexTuple pg relevant
+eliminateForLastRemainingInRow = eliminateForLastRemainingInUnit (\x -> getIndexesForRow (x*9))
 
 eliminateForLastRemainingInColumn :: Int -> [[Int]] -> [[Int]]
-eliminateForLastRemainingInColumn n pg = 
-  let
-    possiblecellsbynumber = getPossibleCellsForNumbers pg
-    cellsbycolumn = getIndexesForColumn n
-    overlap = map (intersection cellsbycolumn) possiblecellsbynumber
-    relevant = getSingleOptionNumbers overlap
-  in
-    foldr solveCellForNumberAtIndexTuple pg relevant
+eliminateForLastRemainingInColumn = eliminateForLastRemainingInUnit getIndexesForColumn
 
 --iterateUntilEqual - is a way of running the same strategy function over a
 --puzzle as long as "needed."  It is used to run the strategy function over the
