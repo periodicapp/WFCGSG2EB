@@ -1,6 +1,9 @@
 import Data.Char (digitToInt, intToDigit, chr)
 import Data.List (intersperse)
 
+intersection :: (Eq a) => [a] -> [a] -> [a]
+intersection xs ys = [y | y <- ys, y `elem` xs]
+  
 --initGrid takes a list of integers representing an unsolved Sudoku puzzle (all
 --solved cells should be 1-9, with 0 standing in for an unsolved cell) and
 --converts it to a list of lists of integers, each of whcih is 10 items long.
