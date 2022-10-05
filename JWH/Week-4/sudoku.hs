@@ -210,6 +210,21 @@ removePossibilityFromCells (cell:cells) indexes current value
   | otherwise = cell : removePossibilityFromCells cells indexes (current+1) value
   
 
+--solveCellForNumberAtIndex - takes an array-of-cells representation of a
+--puzzle, a number, and an index and replaces the cell at the indicated index
+--with a cell "solved" for the given number.  It does this by converting the
+--array-of-cells to an array of tuples pairing cells with their index and then
+--iterates over the list until it finds the tuple with the right index.
+solveCellForNumberAtIndex :: [[Int]] -> Int -> Int -> [[Int]]
+solveCellForNumberAtIndex pg num idx = replacer (getIndexedCells pg) num idx
+  where
+    replacer [] _ _ = []
+    replacer ((i,cl):cls) n ix = if i == ix then [num] : replacer cls num idx else cl : replacer cls num idx
+
+solveCellForNumberAtIndexTuple :: (Int,Int) -> [[Int]] -> [[Int]]
+solveCellForNumberAtIndexTuple (n,i) pg = solveCellForNumberAtIndex pg n i
+
+
 --eliminateForSolvedCell - once a cell is "solved," no other cells in its row,
 --column or box can share a value with it.  So, given a (row,column)
 --representation of a cell, remove the value from the possibilities list of all
@@ -234,14 +249,51 @@ eliminateForSolvedCells pg =
   in
     foldr eliminateForSolvedCell pg solvedindexes
 
-eliminateForLastRemainingInBox :: [[Int]] -> [[Int]]
-eliminateForLastRemainingInBox pg =
+
+--getSingleOptionNumbers - takes a list of lists of indexes and returns
+--pairings of number and index to feed into solveCellForNumberAtIndex - that
+--is, it will be a list of tuples the left member of which is a number to put
+--in a cell and the right member of which is the index of the cell in the
+--array-of-cells puzzle representation.  The input list of lists of indexes is
+--arranged in such a way that the list of indexes is at the place in the master
+--list that corresponds to the number.  (So, the first list of indexes in the
+--list represents the indexes of cells that have 1 as a possible value, the
+--next for 2 and so on.)  So, this function just pulls out all the ones that
+--are length 1, since if a cell in a context is the only cell that can have
+--that number as the value, then it must also have that number as the value.
+getSingleOptionNumbers :: [[Int]] -> [(Int,Int)]
+getSingleOptionNumbers cells = [(num,head idx) | (num,idx) <- (zip [1..] cells), length idx == 1]
+
+--eliminateForLastRemainingInBox :: [[Int]] -> [(Int,Int)]
+eliminateForLastRemainingInBox :: Int -> [[Int]] -> [[Int]]
+eliminateForLastRemainingInBox n pg =
   let
     possiblecellsbynumber = getPossibleCellsForNumbers pg
-    cellsbybox = map getIndexesForBoxNumber [0..8]
+    cellsbybox = getIndexesForBoxNumber n
+    overlap = map (intersection cellsbybox) possiblecellsbynumber
+    relevant = getSingleOptionNumbers overlap
   in
-    cellsbybox
+    foldr solveCellForNumberAtIndexTuple pg relevant
 
+eliminateForLastRemainingInRow :: Int -> [[Int]] -> [[Int]]
+eliminateForLastRemainingInRow n pg = 
+  let
+    possiblecellsbynumber = getPossibleCellsForNumbers pg
+    cellsbyrow = getIndexesForRow (n*9)
+    overlap = map (intersection cellsbyrow) possiblecellsbynumber
+    relevant = getSingleOptionNumbers overlap
+  in
+    foldr solveCellForNumberAtIndexTuple pg relevant
+
+eliminateForLastRemainingInColumn :: Int -> [[Int]] -> [[Int]]
+eliminateForLastRemainingInColumn n pg = 
+  let
+    possiblecellsbynumber = getPossibleCellsForNumbers pg
+    cellsbycolumn = getIndexesForColumn n
+    overlap = map (intersection cellsbycolumn) possiblecellsbynumber
+    relevant = getSingleOptionNumbers overlap
+  in
+    foldr solveCellForNumberAtIndexTuple pg relevant
 
 --iterateUntilEqual - is a way of running the same strategy function over a
 --puzzle as long as "needed."  It is used to run the strategy function over the
@@ -257,8 +309,17 @@ iterateUntilEqual f i =
 eliminateForSolvedCellsStrategy :: [[Int]] -> [[Int]]
 eliminateForSolvedCellsStrategy pg = iterateUntilEqual (eliminateForSolvedCells . markSolvedCells) pg
 
-lastRemainingCellInBoxStrategy :: [[Int]] -> [[Int]]
-lastRemainingCellInBoxStrategy pg = iterateUntilEqual eliminateForLastRemainingInBox pg
+eliminateForLastRemainingInBoxStrategy :: [[Int]] -> [[Int]]
+eliminateForLastRemainingInBoxStrategy pg = iterateUntilEqual (\x -> eliminateForSolvedCellsStrategy $ (foldr eliminateForLastRemainingInBox x [0..8])) pg
+
+eliminateForLastRemainingInRowStrategy :: [[Int]] -> [[Int]]
+eliminateForLastRemainingInRowStrategy pg = iterateUntilEqual (\x -> eliminateForSolvedCellsStrategy $ (foldr eliminateForLastRemainingInRow x [0..8])) pg
+
+eliminateForLastRemainingInColumnStrategy :: [[Int]] -> [[Int]]
+eliminateForLastRemainingInColumnStrategy pg = iterateUntilEqual (\x -> eliminateForSolvedCellsStrategy $ (foldr eliminateForLastRemainingInColumn x [0..8])) pg
+
+--lastRemainingCellInBoxStrategy :: [[Int]] -> [[Int]]
+--lastRemainingCellInBoxStrategy pg = iterateUntilEqual eliminateForLastRemainingInBox pg
 
 applyStrategy :: ([[Int]] -> [[Int]]) -> [[Int]] -> [[Int]]
 applyStrategy strategy pg = strategy pg
@@ -290,6 +351,9 @@ solveAndShow :: [[Int]] -> IO ()
 solveAndShow pz = do
   putStrLn . printGrid $ pz
   putStrLn . printGrid . eliminateForSolvedCellsStrategy $ pz
+  putStrLn . printGrid . eliminateForLastRemainingInBoxStrategy . eliminateForSolvedCellsStrategy $ pz
+  putStrLn . printGrid . eliminateForLastRemainingInRowStrategy . eliminateForLastRemainingInBoxStrategy . eliminateForSolvedCellsStrategy $ pz
+  putStrLn . printGrid . eliminateForLastRemainingInColumnStrategy . eliminateForLastRemainingInRowStrategy . eliminateForLastRemainingInBoxStrategy . eliminateForSolvedCellsStrategy $ pz
   putStrLn "\n\n"
 
 --main = print $ initGrid 0 $ take 81 (repeat 0)
@@ -302,8 +366,12 @@ main =
     print $ (getPossibleCellsForNumber 9) . getIndexedCells $ puzzles !! 2
     print $ getPossibleCellsForNumbers $ puzzles !! 2
     print $ map getIndexesForBoxNumber [0..8]
+    --solveAndShow $ puzzles !! 2 
+    --print $ eliminateForLastRemainingInBox . eliminateForSolvedCellsStrategy $ puzzles !! 2
+    --solveAndShow $ puzzles !! 4
+    --putStrLn . printGrid $ (\x -> solveCellForNumberAtIndex x 9 22) . eliminateForSolvedCellsStrategy $ puzzles !! 2
     --let puzzle = readPuzzle $ ((!!2) . lines) input
-    --mapM solveAndShow $ puzzles 
+    mapM solveAndShow $ puzzles 
     --mapM (print . getIndexesForBoxNumber) [0..9]
     --mapM (putStrLn . printGrid) puzzles
     --putStr $ printGrid puzzle
