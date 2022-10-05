@@ -1,9 +1,14 @@
 import Data.Char (digitToInt, intToDigit, chr)
 import Data.List (intersperse)
 
---data PuzzleGrid = PuzzleGrid [[Int]]
---  deriving (Show)
-
+--initGrid takes a list of integers representing an unsolved Sudoku puzzle (all
+--solved cells should be 1-9, with 0 standing in for an unsolved cell) and
+--converts it to a list of lists of integers, each of whcih is 10 items long.
+--The head of the list is the value of the cell, and the remainder is the list
+--of possible values for the cell.  Initially, all 9 values are possible for
+--every cell, so function is just a matter of putting the head onto the list
+--[1,2,3,4,5,6,7,8,9].  (clearSolvedCell will run over this next and remove the
+--possibilities list from any cell that has a non-zero value - i.e. is "solved"
 initGrid :: [Int] -> [[Int]]
 initGrid = map (\x -> x:[1..9])
 
@@ -16,7 +21,7 @@ removeItem x (y:ys)
 
 --removePossibility takes an integer representing a value for a cell that is no
 --longer possible for that cell and removes it from the list of possibilities.
---Because the representation used is a list of at most 10 - with the head
+--Because the representation used is a list of at most 10 items - with the head
 --representing the current value of the cell and the tail representing the
 --remaining possible values (when the cell hasn't been solved) - we do this by
 --concatenating the existing head onto the result of removing the value from
@@ -35,20 +40,26 @@ clearSolvedCell (x:xs)
   | x /= 0 = [x]
   | otherwise = (x:xs)
 
---solveCell detects whether a cell has been solved and, if so, marks it as
---solved.  A cell is "solved" when it is an array of length 2: the first member
---being the current value of the cell and the second being the remaining
---possibilities.  (If there is only one possibility, the cell is solved.)  Mark
---the cell as solved by replacing the head value (i.e. the current value) with
---the second value (i.e. the remaining possibility).
+--solveCell detects whether a cell has been pre-solved (i.e. had all its
+--possible values but one removed from the tail of the representation list)
+--and, if so, marks it as solved.  A cell is "pre-solved" when it is an array
+--of length 2: the first member being the current value of the cell and the
+--second being the remaining possibilities.  (If there is only one possibility,
+--the cell is solved.)  Mark the cell as solved by replacing the head value
+--(i.e.  the current value) with the second value (i.e. the remaining
+--possibility).
 solveCell :: [Int] -> [Int]
 solveCell cl
   | (length cl) == 2 = [cl !! 1]
   | otherwise = cl
 
+--markSolvedCells - iterate over all cells, detect which ones are "pre-solved"
+--and "solve" them
 markSolvedCells :: [[Int]] -> [[Int]]
 markSolvedCells = map solveCell
 
+--convertString takes an input string representing a puzzle and converts it to
+--a list of integers
 convertString :: [Char] -> [Int]
 convertString = map digitToInt
 
@@ -60,24 +71,40 @@ convertString = map digitToInt
 gridNumbers :: [[Int]] -> [Int]
 gridNumbers pg = map head pg
 
+--readPuzzle takes an input string representing a puzzle and returns the
+--cleaned-up representation of the puzzle as a list of lists of integers
 readPuzzle :: [Char] -> [[Int]] 
 readPuzzle = (map clearSolvedCell) . initGrid  . convertString
 
-isSolved :: [[Int]] -> Bool
-isSolved pg = all (>0) $ gridNumbers pg
+--isComplete detects whether a puzzle is complete in the sense of having no
+--0-valued cells - that is, every cell has a value between 1-9.
+isComplete :: [[Int]] -> Bool
+isComplete pg = all (>0) $ gridNumbers pg
 
+--chunksOf takes an integer n and a list and splits the list into sections of
+--length n.  e.g. chunksOf 2 [2,4,6,8] = [[2,4],[6,8]]
 chunksOf :: Int -> [a] -> [[a]]
 chunksOf _ [] = []
 chunksOf n ls 
   | n > 0 = (take n ls) : (chunksOf n (drop n ls))
   | otherwise = []
 
+
+--addSeparators takes a list of strings - each representing a row in the string
+--representation of a puzzle - and adds boundary rows at the top, at the
+--bottom, and after each third row
 addSeparators :: [[Char]] -> Int -> [[Char]]
 addSeparators (l:ls) i 
   | ls == [] = [l, "+-----+-----+-----+\n"]
   | i `mod` 3 == 0 = "+-----+-----+-----+\n" : l : addSeparators ls (i+1)
   | otherwise = l : addSeparators ls (i+1)
 
+--renderGridLine takes a list of 81 integers representing the values of the
+--cells of a puzzle, converts them to characters, groups them into chunks of
+--three (each representing the "box" section of a row) and then again into
+--chunks of three (each representing a row - since a row is three groups of
+--three cells), and then adds "|" characters around the subsections of each row
+--to mark the begining and end and each section of the row.
 renderGridLine :: [Int] -> [[Char]]
 renderGridLine [] = [] 
 renderGridLine ls = 
@@ -89,17 +116,26 @@ renderGridLine ls =
   in
     separated
 
+--getItemsAtIndexes takes a list of things and a list of Ints representing
+--indexes and returns a list populated with the item from the first list at the
+--index indicated by each Int in the second list.
 getItemsAtIndexes :: [a] -> [Int] -> [a]
 getItemsAtIndexes pg [] = [] 
 getItemsAtIndexes pg (i:idxs)
   | idxs == [] = [(pg !! i)]
   | otherwise = (pg !! i) : getItemsAtIndexes pg idxs
 
+--getIndexesForRow given an index representing the start of a row (so, this
+--must be an even multiple of 9 for a 9x9 matrix), return the indexes for the
+--row
 getIndexesForRow :: Int -> [Int]
 getIndexesForRow i
   | i >= 0 && i < 81 && i `mod` 9 == 0 = [i..(i+8)]
   | otherwise = []
 
+--getIndexesForColumn given an index representing the start of a column (so,
+--this must be between 0-8), return the indexes for the column - which are
+--gotten by incrementing by 9 until we're past 80.
 getIndexesForColumn :: Int -> [Int]
 getIndexesForColumn i
   | i >= 0 && i < 9 = [i,(i+9)..80]
