@@ -125,6 +125,9 @@ getSolvedIndexes pg = gsi 0 pg
    gsi n [] = []
    gsi n (x:xs) = if (length x) == 1 then (head x,n) : gsi (n+1) xs else gsi (n+1) xs
 
+getIndexedCells :: [[Int]] -> [(Int,[Int])]
+getIndexedCells = zip [0..]
+
 removePossibilityFromCells :: [[Int]] -> [Int] -> Int -> Int -> [[Int]]
 removePossibilityFromCells [] _ _ _ = []
 removePossibilityFromCells (cell:cells) indexes current value
@@ -194,9 +197,11 @@ solveAndShow pz = do
 main = 
   do
     input <- readFile "easy50.txt"
-    --let puzzle = readPuzzle $ ((!!0) . lines) input
     let puzzles = map readPuzzle $ lines input
-    mapM solveAndShow $ puzzles 
+    putStrLn $ printGrid $ puzzles !! 2
+    print $ getIndexedCells $ puzzles !! 2
+    --let puzzle = readPuzzle $ ((!!2) . lines) input
+    --mapM solveAndShow $ puzzles 
     --mapM (print . getIndexesForBoxNumber) [0..9]
     --mapM (putStrLn . printGrid) puzzles
     --putStr $ printGrid puzzle
@@ -225,66 +230,3 @@ main =
     --print $ (flip getGrid (5,8)) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
     --print $ (flip getGrid (6,5)) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
     --print $ (flip getItemsAtIndexes [0,4,8,9]) $ readPuzzle $ ((!!0) . lines) input
-    --print $ getCoordinatesFromIndex 80
-    --print $ getIndexFromCoordinates (8,8)
-    --print $ getCoordinatesFromIndex 79
-    --print $ getIndexFromCoordinates (8,7)
-    --print $ getCoordinatesFromIndex 78
-    --print $ getIndexFromCoordinates (8,6)
-    --print $ getCoordinatesFromIndex 77
-    --print $ getIndexFromCoordinates (8,5)
-    --print $ getCoordinatesFromIndex 76
-    --print $ getIndexFromCoordinates (8,4)
-    --print $ getCoordinatesFromIndex 75
-    --print $ getIndexFromCoordinates (8,3)
-    --print $ getCoordinatesFromIndex 74
-    --print $ getIndexFromCoordinates (8,2)
-    --print $ getCoordinatesFromIndex 73
-    --print $ getIndexFromCoordinates (8,1)
-    --print $ getCoordinatesFromIndex 72
-    --print $ getIndexFromCoordinates (8,0)
-    --print $ getCoordinatesFromIndex 71
-    --print $ getIndexFromCoordinates (7,8)
-    --print $ getCoordinatesFromIndex 70
-    --print $ getIndexFromCoordinates (7,7)
-    --print $ getCoordinatesFromIndex 69
-    --print $ getIndexFromCoordinates (7,6)
-    --print $ getCoordinatesFromIndex 68
-    --print $ getIndexFromCoordinates (7,5)
-    --print $ getCoordinatesFromIndex 67
-    --print $ getIndexFromCoordinates (7,4)
-    --print $ getCoordinatesFromIndex 66
-    --print $ getIndexFromCoordinates (7,3)
-    --print $ getCoordinatesFromIndex 65
-    --print $ getIndexFromCoordinates (7,2)
-    --print $ getCoordinatesFromIndex 64
-    --print $ getIndexFromCoordinates (7,1)
-    --print $ getCoordinatesFromIndex 63
-    --print $ getIndexFromCoordinates (7,0)
-    --print $ getCoordinatesFromIndex 62
-    --print $ getIndexFromCoordinates (6,8)
-    --print $ getCoordinatesFromIndex 61
-    --print $ getIndexFromCoordinates (6,7)
-    --print $ getCoordinatesFromIndex 60
-    --print $ getIndexFromCoordinates (6,6)
-    --print $ isSolved $ readPuzzle $ ((!!0) . lines) input
-    --print $ ((flip getRow) 0) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
-    --print $ ((flip getRow) 1) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
-    --print $ ((flip getRow) 2) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
-    --print $ ((flip getRow) 3) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
-    --print $ ((flip getRow) 4) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
-    --print $ ((flip getRow) 5) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
-    --print $ ((flip getRow) 6) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
-    --print $ ((flip getRow) 7) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
-    --print $ ((flip getRow) 8) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
-    --print $ ((flip getColumn) 0) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
-    --print $ ((flip getColumn) 1) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
-    --print $ ((flip getColumn) 2) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
-    --print $ ((flip getColumn) 3) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
-    --print $ ((flip getColumn) 4) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
-    --print $ ((flip getColumn) 5) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
-    --print $ ((flip getColumn) 6) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
-    --print $ ((flip getColumn) 7) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
-    --print $ ((flip getColumn) 8) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
-    --print $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
-    --print $ readPuzzle $ ((!!0) . lines) input
