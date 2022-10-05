@@ -113,6 +113,9 @@ getIndexesForGrid (row,column) =
   in
     [x | rw <- [0,1,2], x <- (take 3) . (drop columnoffset) . getIndexesForRow $ ((rw+rowoffset)*9)]
 
+getIndexesForBoxNumber :: Int -> [Int]
+getIndexesForBoxNumber n = getIndexesForGrid ((n `div` 3) * 3, (n `mod` 3) * 3)
+
 getIndexesForPeers :: (Int,Int) -> [Int]
 getIndexesForPeers (row,column) = (getIndexesForRow (row*9)) ++ (getIndexesForColumn column) ++ (getIndexesForGrid (row,column))
 
@@ -143,6 +146,9 @@ eliminateForSolvedCells pg =
   in
     foldr eliminateForSolvedCell pg solvedindexes
 
+eliminateForLastRemainingInBox :: [[Int]] -> [[Int]]
+eliminateForLastRemainingInBox pg = pg
+
 iterateUntilEqual :: (Eq a) => (a -> a) -> a -> a
 iterateUntilEqual f i =
   let
@@ -152,6 +158,9 @@ iterateUntilEqual f i =
 
 eliminateForSolvedCellsStrategy :: [[Int]] -> [[Int]]
 eliminateForSolvedCellsStrategy pg = iterateUntilEqual (eliminateForSolvedCells . markSolvedCells) pg
+
+lastRemainingCellInBoxStrategy :: [[Int]] -> [[Int]]
+lastRemainingCellInBoxStrategy pg = iterateUntilEqual eliminateForLastRemainingInBox pg
 
 applyStrategy :: ([[Int]] -> [[Int]]) -> [[Int]] -> [[Int]]
 applyStrategy strategy pg = strategy pg
@@ -174,23 +183,34 @@ getIndexFromCoordinates (i,j) = (i*9) + j
 printGrid :: [[Int]] -> [Char]
 printGrid = (foldr (++) "") . renderGridLine . gridNumbers
 
+  
+solveAndShow :: [[Int]] -> IO ()
+solveAndShow pz = do
+  putStrLn . printGrid $ pz
+  putStrLn . printGrid . eliminateForSolvedCellsStrategy $ pz
+  putStrLn "\n\n"
+
 --main = print $ initGrid 0 $ take 81 (repeat 0)
 main = 
   do
     input <- readFile "easy50.txt"
-    let puzzle = readPuzzle $ ((!!0) . lines) input
-    putStr $ printGrid puzzle
-    putStrLn "\n\n"
-    print $ puzzle
-    putStrLn "\n\n"
+    --let puzzle = readPuzzle $ ((!!0) . lines) input
+    let puzzles = map readPuzzle $ lines input
+    mapM solveAndShow $ puzzles 
+    --mapM (print . getIndexesForBoxNumber) [0..9]
+    --mapM (putStrLn . printGrid) puzzles
+    --putStr $ printGrid puzzle
+    --putStrLn "\n\n"
+    --print $ puzzle
+    --putStrLn "\n\n"
     --print $ eliminateForSolvedCell puzzle (8,29)
-    putStrLn "\n\n"
+    --putStrLn "\n\n"
     --putStrLn $ printGrid $ iterate (eliminateForSolvedCells . markSolvedCells) puzzle !! 8
     --putStrLn $ printGrid $ iterate (eliminateForSolvedCells . markSolvedCells) puzzle !! 9
     --putStrLn $ printGrid $ iterate (eliminateForSolvedCells . markSolvedCells) puzzle !! 10
     --putStrLn $ printGrid $ iterate (eliminateForSolvedCells . markSolvedCells) puzzle !! 11
     --print $ (iterate (eliminateForSolvedCells . markSolvedCells) puzzle !! 11) == (iterate (eliminateForSolvedCells . markSolvedCells) puzzle !! 10)
-    putStrLn $ printGrid $ eliminateForSolvedCellsStrategy puzzle
+    --putStrLn $ printGrid $ eliminateForSolvedCellsStrategy puzzle
     --mapM (putStr . printGrid . readPuzzle) $ lines $ input
     --print $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
     --print $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
