@@ -22,6 +22,11 @@ removeItem x (y:ys)
   | x == y = removeItem x ys
   | otherwise = y : removeItem x ys
 
+--removeItems takes a list of items and another list of items and removes any
+--instance of a member of the first list from the second
+removeItems :: [Int] -> [Int] -> [Int]
+removeItems xs ys = foldr ($) ys (map removeItem xs)
+
 --removePossibility takes an integer representing a value for a cell that is no
 --longer possible for that cell and removes it from the list of possibilities.
 --Because the representation used is a list of at most 10 items - with the head
@@ -264,6 +269,42 @@ eliminateForSolvedCells pg =
 getSingleOptionNumbers :: [[Int]] -> [(Int,Int)]
 getSingleOptionNumbers cells = [(num,head idx) | (num,idx) <- (zip [1..] cells), length idx == 1]
 
+
+--findNakedPairs - takes a list of lists of Int, each representing a cell in
+--the puzzle, and returns the ones that have exactly two remaining items in
+--their possibilities list
+findNakedPairs :: [[Int]] -> [[Int]]
+findNakedPairs cells = filter (\x -> length x == 3) cells
+
+--possibilitiesEq = takes two lists and returns true if their tails are equal.
+--This is used to detect cells that are equal in terms of their possibilities
+--lists
+possibilitiesEq :: [Int] -> [Int] -> Bool
+possibilitiesEq (x:xs) (y:ys) = xs == ys
+
+--findRepeatedPossibilities - takes a list of cells and retains the first of
+--any that have a possibilities list that is duplicated by a later cell in the
+--list
+findRepeatedPossibilities :: [[Int]] -> [[Int]]
+findRepeatedPossibilities [] = []
+findRepeatedPossibilities (x:xs) = if any (possibilitiesEq x) xs then x : findRepeatedPossibilities xs else findRepeatedPossibilities xs
+
+-- NEXT
+-- 1. eliminateForNakedPairsInUnit - use findNakedPairs to find the cell tails for a naked pair in the unit
+-- 2. use removeItems to implement a function that removes the items from all peer cells IFF the peer cell doesnt have exactly the same items
+-- 3. NOTE: will need a function that detects "exactly the same."  Probably it's OK to just use == since all possibilities lists are sorted at inception and nothing disturbs the order
+-- FINISH eliminateForNakedPairsInUnit (immediately below)
+--
+
+eliminateForNakedPairsInUnit :: (Int -> [Int]) -> Int -> [[Int]] -> [[Int]]
+eliminateForNakedPairsInUnit f n pg =
+  let
+    indexes = f n
+    cells = getItemsAtIndexes pg indexes
+    nakedpairs = (findRepeatedPossibilities . findNakedPairs) cells
+  in
+    pg
+
 eliminateForLastRemainingInUnit :: (Int -> [Int]) -> Int -> [[Int]] -> [[Int]]
 eliminateForLastRemainingInUnit f n pg = 
   let
@@ -308,6 +349,9 @@ eliminateForLastRemainingInColumnStrategy pg = iterateUntilEqual (\x -> eliminat
 
 getRow :: [Int] -> Int -> [Int]
 getRow grd i = getItemsAtIndexes grd (getIndexesForRow (i*9))
+
+getRowCells :: [[Int]] -> Int -> [[Int]]
+getRowCells pg i = getItemsAtIndexes pg (getIndexesForRow (i*9))
 
 getColumn :: [Int] -> Int -> [Int]
 getColumn grd i = getItemsAtIndexes grd (getIndexesForColumn i)
