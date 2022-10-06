@@ -35,6 +35,7 @@ removeItems xs ys = foldr ($) ys (map removeItem xs)
 --concatenating the existing head onto the result of removing the value from
 --the tail
 removePossibility :: Int -> [Int] -> [Int]
+removePossibility _ [] = []
 removePossibility i (x:xs) = x : removeItem i xs
 
 --clearSolvedCell takes list of Int representing a cell and, if the cell is
@@ -270,12 +271,6 @@ getSingleOptionNumbers :: [[Int]] -> [(Int,Int)]
 getSingleOptionNumbers cells = [(num,head idx) | (num,idx) <- (zip [1..] cells), length idx == 1]
 
 
---findNakedPairs - takes a list of lists of Int, each representing a cell in
---the puzzle, and returns the ones that have exactly two remaining items in
---their possibilities list
-findNakedPairs :: [[Int]] -> [[Int]]
-findNakedPairs cells = filter (\x -> length x == 3) cells
-
 --possibilitiesEq = takes two lists and returns true if their tails are equal.
 --This is used to detect cells that are equal in terms of their possibilities
 --lists
@@ -289,6 +284,12 @@ findRepeatedPossibilities :: [[Int]] -> [[Int]]
 findRepeatedPossibilities [] = []
 findRepeatedPossibilities (x:xs) = if any (possibilitiesEq x) xs then x : findRepeatedPossibilities xs else findRepeatedPossibilities xs
 
+--findNakedPairs - takes a list of lists of Int, each representing a cell in
+--the puzzle, and returns the ones that have exactly two remaining items in
+--their possibilities list
+findNakedPairs :: [[Int]] -> [[Int]]
+findNakedPairs cells = findRepeatedPossibilities $ (filter (\x -> length x == 3) cells)
+
 -- NEXT
 -- 1. eliminateForNakedPairsInUnit - use findNakedPairs to find the cell tails for a naked pair in the unit
 -- 2. use removeItems to implement a function that removes the items from all peer cells IFF the peer cell doesnt have exactly the same items
@@ -296,14 +297,27 @@ findRepeatedPossibilities (x:xs) = if any (possibilitiesEq x) xs then x : findRe
 -- FINISH eliminateForNakedPairsInUnit (immediately below)
 --
 
+eliminateNakedPairFromCell :: [Int] -> [Int] -> [Int]
+eliminateNakedPairFromCell pair cell 
+  | cell == [] = []
+  | pair == [] = cell
+  | pair == (tail cell) = cell
+  | otherwise = (head cell) : (removeItems pair (tail cell))
+
+eliminateNakedPairFromIndexes :: [Int] -> Int -> [Int] -> [[Int]] -> [[Int]]
+eliminateNakedPairFromIndexes _ _ _ [] = []
+eliminateNakedPairFromIndexes idxs current pair (cell:cells)
+  | current `elem` idxs = (eliminateNakedPairFromCell pair cell) : eliminateNakedPairFromIndexes idxs (current+1) pair cells
+  | otherwise = cell : eliminateNakedPairFromIndexes idxs (current+1) pair cells
+
 eliminateForNakedPairsInUnit :: (Int -> [Int]) -> Int -> [[Int]] -> [[Int]]
 eliminateForNakedPairsInUnit f n pg =
   let
     indexes = f n
     cells = getItemsAtIndexes pg indexes
-    nakedpairs = (findRepeatedPossibilities . findNakedPairs) cells
+    nakedpairs = findNakedPairs cells
   in
-    pg
+    if (length nakedpairs) == 0 then pg else foldr (eliminateNakedPairFromIndexes indexes 0) pg nakedpairs
 
 eliminateForLastRemainingInUnit :: (Int -> [Int]) -> Int -> [[Int]] -> [[Int]]
 eliminateForLastRemainingInUnit f n pg = 
@@ -323,6 +337,15 @@ eliminateForLastRemainingInRow = eliminateForLastRemainingInUnit (\x -> getIndex
 
 eliminateForLastRemainingInColumn :: Int -> [[Int]] -> [[Int]]
 eliminateForLastRemainingInColumn = eliminateForLastRemainingInUnit getIndexesForColumn
+
+eliminateForNakedPairsInBox :: Int -> [[Int]] -> [[Int]]
+eliminateForNakedPairsInBox = eliminateForNakedPairsInUnit getIndexesForBoxNumber
+
+eliminateForNakedPairsInRow :: Int -> [[Int]] -> [[Int]]
+eliminateForNakedPairsInRow = eliminateForNakedPairsInUnit (\x -> getIndexesForRow (x*9))
+
+eliminateForNakedPairsInColumn :: Int -> [[Int]] -> [[Int]]
+eliminateForNakedPairsInColumn = eliminateForNakedPairsInUnit getIndexesForColumn
 
 --iterateUntilEqual - is a way of running the same strategy function over a
 --puzzle as long as "needed."  It is used to run the strategy function over the
@@ -346,6 +369,15 @@ eliminateForLastRemainingInRowStrategy pg = iterateUntilEqual (\x -> eliminateFo
 
 eliminateForLastRemainingInColumnStrategy :: [[Int]] -> [[Int]]
 eliminateForLastRemainingInColumnStrategy pg = iterateUntilEqual (\x -> eliminateForSolvedCellsStrategy $ (foldr eliminateForLastRemainingInColumn x [0..8])) pg
+
+eliminateForNakedPairsInBoxStrategy :: [[Int]] -> [[Int]]
+eliminateForNakedPairsInBoxStrategy pg = iterateUntilEqual (\x -> eliminateForSolvedCellsStrategy $ (foldr eliminateForNakedPairsInBox x [0..8])) pg
+
+eliminateForNakedPairsInRowStrategy :: [[Int]] -> [[Int]]
+eliminateForNakedPairsInRowStrategy pg = iterateUntilEqual (\x -> eliminateForSolvedCellsStrategy $ (foldr eliminateForNakedPairsInRow x [0..8])) pg
+
+eliminateForNakedPairsInColumnStrategy :: [[Int]] -> [[Int]]
+eliminateForNakedPairsInColumnStrategy pg = iterateUntilEqual (\x -> eliminateForSolvedCellsStrategy $ (foldr eliminateForNakedPairsInColumn x [0..8])) pg
 
 getRow :: [Int] -> Int -> [Int]
 getRow grd i = getItemsAtIndexes grd (getIndexesForRow (i*9))
@@ -375,16 +407,43 @@ printGrid = (foldr (++) "") . renderGridLine . gridNumbers
 
 solveAndShow :: [[Int]] -> IO ()
 solveAndShow pz = do
-  putStrLn . printGrid $ pz
-  putStrLn . printGrid . eliminateForSolvedCellsStrategy $ pz
-  putStrLn . printGrid . eliminateForLastRemainingInBoxStrategy . eliminateForSolvedCellsStrategy $ pz
-  putStrLn . printGrid . eliminateForLastRemainingInRowStrategy . eliminateForLastRemainingInBoxStrategy . eliminateForSolvedCellsStrategy $ pz
-  putStrLn . printGrid . eliminateForLastRemainingInColumnStrategy . eliminateForLastRemainingInRowStrategy . eliminateForLastRemainingInBoxStrategy . eliminateForSolvedCellsStrategy $ pz
+  --putStrLn . printGrid $ pz
+  --putStrLn . printGrid . eliminateForSolvedCellsStrategy $ pz
+  --putStrLn . printGrid . eliminateForLastRemainingInBoxStrategy . eliminateForSolvedCellsStrategy $ pz
+  --putStrLn . printGrid . eliminateForLastRemainingInRowStrategy . eliminateForLastRemainingInBoxStrategy . eliminateForSolvedCellsStrategy $ pz
+  --putStrLn . printGrid . eliminateForLastRemainingInColumnStrategy . eliminateForLastRemainingInRowStrategy . eliminateForLastRemainingInBoxStrategy . eliminateForSolvedCellsStrategy $ pz
+  let fullsolution = eliminateForNakedPairsInBoxStrategy . eliminateForNakedPairsInColumnStrategy . eliminateForNakedPairsInRowStrategy . eliminateForLastRemainingInBoxStrategy .  eliminateForLastRemainingInColumnStrategy . eliminateForLastRemainingInRowStrategy . eliminateForSolvedCellsStrategy $ pz
+  putStrLn . printGrid $ fullsolution
+  print $ fullsolution
+  print $ isComplete $ fullsolution
   putStrLn "\n\n"
 
+debug pz = do
+  putStrLn . printGrid $ pz
+  let first_pass = eliminateForSolvedCellsStrategy $ pz
+  let second_pass = eliminateForLastRemainingInBoxStrategy . eliminateForSolvedCellsStrategy $ pz
+  let third_pass = eliminateForLastRemainingInRowStrategy . eliminateForLastRemainingInBoxStrategy . eliminateForSolvedCellsStrategy $ pz
+  let fourth_pass = eliminateForLastRemainingInColumnStrategy . eliminateForLastRemainingInRowStrategy . eliminateForLastRemainingInBoxStrategy . eliminateForSolvedCellsStrategy $ pz
+  putStrLn . printGrid $ first_pass
+  print $ first_pass
+  putStrLn . printGrid $ second_pass
+  print $ second_pass
+  putStrLn . printGrid $ third_pass
+  print $ third_pass
+  putStrLn . printGrid $ fourth_pass
+  print $ fourth_pass
+  --putStrLn . printGrid . 
+  --putStrLn . printGrid . 
+  --putStrLn . printGrid . 
+  let fullsolution = eliminateForNakedPairsInBoxStrategy . eliminateForNakedPairsInColumnStrategy . eliminateForNakedPairsInRowStrategy . eliminateForLastRemainingInBoxStrategy .  eliminateForLastRemainingInColumnStrategy . eliminateForLastRemainingInRowStrategy . eliminateForSolvedCellsStrategy $ pz
+  putStrLn . printGrid $ fullsolution
+  print $ fullsolution
+  print $ isComplete $ fullsolution
+  putStrLn "\n\n"
 --main = print $ initGrid 0 $ take 81 (repeat 0)
 main = 
   do
     input <- readFile "easy50.txt"
     let puzzles = map readPuzzle $ lines input
-    mapM solveAndShow $ puzzles 
+    --mapM solveAndShow $ puzzles 
+    debug $ readPuzzle "380000000000400785009020300060090000800302009000040070001070500495006000000000092"
