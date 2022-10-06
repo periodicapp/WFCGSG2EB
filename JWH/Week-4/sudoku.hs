@@ -306,12 +306,6 @@ eliminateForLastRemainingInRowStrategy pg = iterateUntilEqual (\x -> eliminateFo
 eliminateForLastRemainingInColumnStrategy :: [[Int]] -> [[Int]]
 eliminateForLastRemainingInColumnStrategy pg = iterateUntilEqual (\x -> eliminateForSolvedCellsStrategy $ (foldr eliminateForLastRemainingInColumn x [0..8])) pg
 
---lastRemainingCellInBoxStrategy :: [[Int]] -> [[Int]]
---lastRemainingCellInBoxStrategy pg = iterateUntilEqual eliminateForLastRemainingInBox pg
-
-applyStrategy :: ([[Int]] -> [[Int]]) -> [[Int]] -> [[Int]]
-applyStrategy strategy pg = strategy pg
-
 getRow :: [Int] -> Int -> [Int]
 getRow grd i = getItemsAtIndexes grd (getIndexesForRow (i*9))
 
@@ -349,42 +343,4 @@ main =
   do
     input <- readFile "easy50.txt"
     let puzzles = map readPuzzle $ lines input
-    putStrLn $ printGrid $ puzzles !! 2
-    print $ getIndexedCells $ puzzles !! 2
-    print $ (getPossibleCellsForNumber 9) . getIndexedCells $ puzzles !! 2
-    print $ getPossibleCellsForNumbers $ puzzles !! 2
-    print $ map getIndexesForBoxNumber [0..8]
-    --solveAndShow $ puzzles !! 2 
-    --print $ eliminateForLastRemainingInBox . eliminateForSolvedCellsStrategy $ puzzles !! 2
-    --solveAndShow $ puzzles !! 4
-    --putStrLn . printGrid $ (\x -> solveCellForNumberAtIndex x 9 22) . eliminateForSolvedCellsStrategy $ puzzles !! 2
-    --let puzzle = readPuzzle $ ((!!2) . lines) input
     mapM solveAndShow $ puzzles 
-    --mapM (print . getIndexesForBoxNumber) [0..9]
-    --mapM (putStrLn . printGrid) puzzles
-    --putStr $ printGrid puzzle
-    --putStrLn "\n\n"
-    --print $ puzzle
-    --putStrLn "\n\n"
-    --print $ eliminateForSolvedCell puzzle (8,29)
-    --putStrLn "\n\n"
-    --putStrLn $ printGrid $ iterate (eliminateForSolvedCells . markSolvedCells) puzzle !! 8
-    --putStrLn $ printGrid $ iterate (eliminateForSolvedCells . markSolvedCells) puzzle !! 9
-    --putStrLn $ printGrid $ iterate (eliminateForSolvedCells . markSolvedCells) puzzle !! 10
-    --putStrLn $ printGrid $ iterate (eliminateForSolvedCells . markSolvedCells) puzzle !! 11
-    --print $ (iterate (eliminateForSolvedCells . markSolvedCells) puzzle !! 11) == (iterate (eliminateForSolvedCells . markSolvedCells) puzzle !! 10)
-    --putStrLn $ printGrid $ eliminateForSolvedCellsStrategy puzzle
-    --mapM (putStr . printGrid . readPuzzle) $ lines $ input
-    --print $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
-    --print $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
-    --putStr $ printGrid $ readPuzzle $ ((!!0) . lines) input
-    --print $ readPuzzle $ ((!!0) . lines) input
-    --print $ getSolvedIndexes $ readPuzzle $ ((!!0) . lines) input
-    --print $ getIndexesForPeers (2,6) 
-    --print $ ((flip getRow) 0) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
-    --print $ ((flip getItemsAtIndexes) (getIndexesForRow 0)) $ readPuzzle $ ((!!0) . lines) input
-    --print $ (flip getGrid (0,0)) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
-    --print $ (flip getGrid (1,2)) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
-    --print $ (flip getGrid (5,8)) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
-    --print $ (flip getGrid (6,5)) $ gridNumbers $ readPuzzle $ ((!!0) . lines) input
-    --print $ (flip getItemsAtIndexes [0,4,8,9]) $ readPuzzle $ ((!!0) . lines) input
