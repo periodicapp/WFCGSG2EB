@@ -315,7 +315,7 @@ eliminateForNakedPairsInUnit f n pg =
   let
     indexes = f n
     cells = getItemsAtIndexes pg indexes
-    nakedpairs = findNakedPairs cells
+    nakedpairs = map tail $ findNakedPairs cells
   in
     if (length nakedpairs) == 0 then pg else foldr (eliminateNakedPairFromIndexes indexes 0) pg nakedpairs
 
@@ -407,16 +407,20 @@ printGrid = (foldr (++) "") . renderGridLine . gridNumbers
 
 solveAndShow :: [[Int]] -> IO ()
 solveAndShow pz = do
-  --putStrLn . printGrid $ pz
+  putStrLn . printGrid $ pz
   --putStrLn . printGrid . eliminateForSolvedCellsStrategy $ pz
   --putStrLn . printGrid . eliminateForLastRemainingInBoxStrategy . eliminateForSolvedCellsStrategy $ pz
   --putStrLn . printGrid . eliminateForLastRemainingInRowStrategy . eliminateForLastRemainingInBoxStrategy . eliminateForSolvedCellsStrategy $ pz
   --putStrLn . printGrid . eliminateForLastRemainingInColumnStrategy . eliminateForLastRemainingInRowStrategy . eliminateForLastRemainingInBoxStrategy . eliminateForSolvedCellsStrategy $ pz
   let fullsolution = eliminateForNakedPairsInBoxStrategy . eliminateForNakedPairsInColumnStrategy . eliminateForNakedPairsInRowStrategy . eliminateForLastRemainingInBoxStrategy .  eliminateForLastRemainingInColumnStrategy . eliminateForLastRemainingInRowStrategy . eliminateForSolvedCellsStrategy $ pz
   putStrLn . printGrid $ fullsolution
-  print $ fullsolution
+  print_rows fullsolution
+  putStrLn "\n"
   print $ isComplete $ fullsolution
   putStrLn "\n\n"
+
+print_rows pz = do
+  mapM print $ chunksOf 9 pz
 
 debug pz = do
   putStrLn . printGrid $ pz
@@ -424,26 +428,35 @@ debug pz = do
   let second_pass = eliminateForLastRemainingInBoxStrategy . eliminateForSolvedCellsStrategy $ pz
   let third_pass = eliminateForLastRemainingInRowStrategy . eliminateForLastRemainingInBoxStrategy . eliminateForSolvedCellsStrategy $ pz
   let fourth_pass = eliminateForLastRemainingInColumnStrategy . eliminateForLastRemainingInRowStrategy . eliminateForLastRemainingInBoxStrategy . eliminateForSolvedCellsStrategy $ pz
+  let fifth_pass = eliminateForNakedPairsInRowStrategy . eliminateForLastRemainingInColumnStrategy . eliminateForLastRemainingInRowStrategy . eliminateForLastRemainingInBoxStrategy . eliminateForSolvedCellsStrategy $ pz
+  let fifth_pass = (eliminateForNakedPairsInRow 8) fourth_pass
   putStrLn . printGrid $ first_pass
   print $ first_pass
+  putStrLn "\n\n"
   putStrLn . printGrid $ second_pass
   print $ second_pass
+  putStrLn "\n\n"
   putStrLn . printGrid $ third_pass
   print $ third_pass
-  putStrLn . printGrid $ fourth_pass
-  print $ fourth_pass
-  --putStrLn . printGrid . 
-  --putStrLn . printGrid . 
-  --putStrLn . printGrid . 
-  let fullsolution = eliminateForNakedPairsInBoxStrategy . eliminateForNakedPairsInColumnStrategy . eliminateForNakedPairsInRowStrategy . eliminateForLastRemainingInBoxStrategy .  eliminateForLastRemainingInColumnStrategy . eliminateForLastRemainingInRowStrategy . eliminateForSolvedCellsStrategy $ pz
-  putStrLn . printGrid $ fullsolution
-  print $ fullsolution
-  print $ isComplete $ fullsolution
   putStrLn "\n\n"
+  putStrLn . printGrid $ fourth_pass
+  print_rows fourth_pass
+  putStrLn "\n\n"
+  putStrLn . printGrid $ fifth_pass
+  print_rows fifth_pass
+  putStrLn "\n\n"
+  --putStrLn . printGrid . 
+  --putStrLn . printGrid . 
+  --putStrLn . printGrid . 
+  --let fullsolution = eliminateForNakedPairsInBoxStrategy . eliminateForNakedPairsInColumnStrategy . eliminateForNakedPairsInRowStrategy . eliminateForLastRemainingInBoxStrategy .  eliminateForLastRemainingInColumnStrategy . eliminateForLastRemainingInRowStrategy . eliminateForSolvedCellsStrategy $ pz
+  --putStrLn . printGrid $ fullsolution
+  --print $ fullsolution
+  --print $ isComplete $ fullsolution
+  --putStrLn "\n\n"
 --main = print $ initGrid 0 $ take 81 (repeat 0)
 main = 
   do
     input <- readFile "easy50.txt"
     let puzzles = map readPuzzle $ lines input
-    --mapM solveAndShow $ puzzles 
-    debug $ readPuzzle "380000000000400785009020300060090000800302009000040070001070500495006000000000092"
+    mapM solveAndShow $ puzzles 
+    --debug $ readPuzzle "380000000000400785009020300060090000800302009000040070001070500495006000000000092"
