@@ -4,6 +4,7 @@ import(
 	"fmt"
 )
 
+var masterList = [9]byte{'1', '2', '3', '4', '5', '6', '7', '8', '9'}
 var fillMap = map[byte]bool{
     '1': true,
     '2': true,
@@ -18,15 +19,30 @@ var fillMap = map[byte]bool{
 var placeholder byte = '.'
 var possibilitiesMap = make(map[[2]int][]byte)
 
-func solveSudoku(board [][]byte)  {
-		// Find all possiblities for each empty space. Stick them in a map like:
-		// [0, 2] = [1, 2, 4]
-		// ...
-    possibilitiesMap = generateAllPossibilities(board)
-		
+func main() {
+	board1 := [][]byte{
+		{'5', '3', '.', '.', '7', '.', '.', '.', '.'},
+		{'6', '.', '.', '1', '9', '5', '.', '.', '.'},
+		{'.', '9', '8', '.', '.', '.', '.', '6', '.'},
+		{'8', '.', '.', '.', '6', '.', '.', '.', '3'},
+		{'4', '.', '.', '8', '.', '3', '.', '.', '1'},
+		{'7', '.', '.', '.', '2', '.', '.', '.', '6'},
+		{'.', '6', '.', '.', '.', '.', '2', '8', '.'},
+		{'.', '.', '.', '4', '1', '9', '.', '.', '5'},
+		{'.', '.', '.', '.', '8', '.', '.', '7', '9'},
+	}
+
+	solveSudoku(board1)
 }
 
-// Traverse the board and find all the possiblities for each empty space
+func solveSudoku(board [][]byte)  {
+    for !boardIsSolved(board) {
+        possibilitiesMap = generateAllPossibilities(board)
+        board = solveSinglePossiblities(board, possibilitiesMap)
+        printBoard(board)
+    }
+}
+
 func generateAllPossibilities(board [][]byte) map[[2]int][]byte {
     returnMap := make(map[[2]int][]byte)
     for i, row := range board {
@@ -40,9 +56,6 @@ func generateAllPossibilities(board [][]byte) map[[2]int][]byte {
     return returnMap
 }
 
-// This finds what's missing from the row, col, and subsquare, and returns
-// the common values over all those arrays.  This leaves you with the only valid 
-// responses for a given space.
 func getPossibilitiesForSpace(board [][]byte, row, col int) []byte {
     missingFromRow := getMissing(board[row])
     missingFromCol := getMissing(getCol(board, col))
@@ -50,7 +63,6 @@ func getPossibilitiesForSpace(board [][]byte, row, col int) []byte {
     return getIntersection(missingFromRow, missingFromCol, missingFromSq)
 }
 
-// Given a []byte, find the nums that are missing (1-9)
 func getMissing(list []byte) []byte {
     fillMapCopy := make(map[byte]bool)
     missing := make([]byte, 0)
@@ -68,7 +80,6 @@ func getMissing(list []byte) []byte {
     return missing
 }
 
-// Given a board and a column index, return an []byte of the nums in the column
 func getCol(board [][]byte, col int) []byte {
     column := make([]byte, 0)
     for i := 0; i < 9; i++ {
@@ -77,7 +88,6 @@ func getCol(board [][]byte, col int) []byte {
     return column
 }
 
-// Given a board and a row/col, get the values for the current subsquare in an []byte
 func getSquare(board [][]byte, row, col int) []byte {
     for row % 3 != 0 {
         row--
@@ -94,7 +104,6 @@ func getSquare(board [][]byte, row, col int) []byte {
     return subsquare
 }
 
-// Takes 3 arrays and returns one that is the intersection of all of them
 func getIntersection(row, col, sq []byte) []byte {
     trackMap := make(map[byte]int)
     intersection := make([]byte, 0)
@@ -113,6 +122,35 @@ func getIntersection(row, col, sq []byte) []byte {
         }
     }
     return intersection
+}
+
+func solveSinglePossiblities(board [][]byte, possibilities map[[2]int][]byte) [][]byte {
+    newBoard := board
+    for k, v := range possibilities {
+        if len(v) == 1 {
+            newBoard[k[0]][k[1]] = v[0]
+        }
+    }
+    return newBoard
+}
+
+func boardIsSolved(board [][]byte) bool {
+    for i, row := range board {
+        for j, _ := range row {
+            if board[i][j] == placeholder {
+                return false
+            }
+        }
+    }
+    return true
+}
+
+func printMap(m map[[2]int][]byte) {
+    for k, v := range m {
+        fmt.Print(k)
+        fmt.Print(": ")
+        fmt.Println(string(v))
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////
