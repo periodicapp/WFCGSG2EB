@@ -1,9 +1,10 @@
 # Week 4
 
 ## Coding Challenge: 
-2133. Check if Every Row and Column Contains All Numbers
+ 2133. Check if Every Row and Column Contains All Numbers
 ### Details:
 Summary: Includes solution involving hashmaps
+
 LeetCode Problem(s): https://leetcode.com/problems/check-if-every-row-and-column-contains-all-numbers/
 
 Language: Golang
