@@ -408,10 +408,6 @@ printGrid = (foldr (++) "") . renderGridLine . gridNumbers
 solveAndShow :: [[Int]] -> IO ()
 solveAndShow pz = do
   putStrLn . printGrid $ pz
-  --putStrLn . printGrid . eliminateForSolvedCellsStrategy $ pz
-  --putStrLn . printGrid . eliminateForLastRemainingInBoxStrategy . eliminateForSolvedCellsStrategy $ pz
-  --putStrLn . printGrid . eliminateForLastRemainingInRowStrategy . eliminateForLastRemainingInBoxStrategy . eliminateForSolvedCellsStrategy $ pz
-  --putStrLn . printGrid . eliminateForLastRemainingInColumnStrategy . eliminateForLastRemainingInRowStrategy . eliminateForLastRemainingInBoxStrategy . eliminateForSolvedCellsStrategy $ pz
   let fullsolution = eliminateForNakedPairsInBoxStrategy . eliminateForNakedPairsInColumnStrategy . eliminateForNakedPairsInRowStrategy . eliminateForLastRemainingInBoxStrategy .  eliminateForLastRemainingInColumnStrategy . eliminateForLastRemainingInRowStrategy . eliminateForSolvedCellsStrategy $ pz
   putStrLn . printGrid $ fullsolution
   print_rows fullsolution
@@ -425,19 +421,20 @@ print_rows pz = do
 debug pz = do
   putStrLn . printGrid $ pz
   let first_pass = eliminateForSolvedCellsStrategy $ pz
-  let second_pass = eliminateForLastRemainingInBoxStrategy . eliminateForSolvedCellsStrategy $ pz
-  let third_pass = eliminateForLastRemainingInRowStrategy . eliminateForLastRemainingInBoxStrategy . eliminateForSolvedCellsStrategy $ pz
-  let fourth_pass = eliminateForLastRemainingInColumnStrategy . eliminateForLastRemainingInRowStrategy . eliminateForLastRemainingInBoxStrategy . eliminateForSolvedCellsStrategy $ pz
-  let fifth_pass = eliminateForNakedPairsInRowStrategy . eliminateForLastRemainingInColumnStrategy . eliminateForLastRemainingInRowStrategy . eliminateForLastRemainingInBoxStrategy . eliminateForSolvedCellsStrategy $ pz
-  let fifth_pass = (eliminateForNakedPairsInRow 8) fourth_pass
+  let second_pass = eliminateForLastRemainingInBoxStrategy first_pass
+  let third_pass = eliminateForLastRemainingInRowStrategy second_pass
+  let fourth_pass = eliminateForLastRemainingInColumnStrategy third_pass
+  let fifth_pass = eliminateForNakedPairsInRowStrategy fourth_pass
+  let sixth_pass = eliminateForNakedPairsInColumnStrategy fifth_pass
+  let seventh_pass = eliminateForNakedPairsInBoxStrategy sixth_pass
   putStrLn . printGrid $ first_pass
-  print $ first_pass
+  print_rows first_pass
   putStrLn "\n\n"
   putStrLn . printGrid $ second_pass
-  print $ second_pass
+  print_rows second_pass
   putStrLn "\n\n"
   putStrLn . printGrid $ third_pass
-  print $ third_pass
+  print_rows third_pass
   putStrLn "\n\n"
   putStrLn . printGrid $ fourth_pass
   print_rows fourth_pass
@@ -445,18 +442,19 @@ debug pz = do
   putStrLn . printGrid $ fifth_pass
   print_rows fifth_pass
   putStrLn "\n\n"
-  --putStrLn . printGrid . 
-  --putStrLn . printGrid . 
-  --putStrLn . printGrid . 
-  --let fullsolution = eliminateForNakedPairsInBoxStrategy . eliminateForNakedPairsInColumnStrategy . eliminateForNakedPairsInRowStrategy . eliminateForLastRemainingInBoxStrategy .  eliminateForLastRemainingInColumnStrategy . eliminateForLastRemainingInRowStrategy . eliminateForSolvedCellsStrategy $ pz
-  --putStrLn . printGrid $ fullsolution
-  --print $ fullsolution
-  --print $ isComplete $ fullsolution
-  --putStrLn "\n\n"
---main = print $ initGrid 0 $ take 81 (repeat 0)
+  putStrLn . printGrid $ sixth_pass
+  print_rows sixth_pass
+  putStrLn "\n\n"
+  putStrLn . printGrid $ seventh_pass
+  print_rows seventh_pass
+  putStrLn "\n\n"
+  print $ isComplete seventh_pass
+  putStrLn "\n\n"
+
 main = 
   do
     input <- readFile "easy50.txt"
     let puzzles = map readPuzzle $ lines input
-    mapM solveAndShow $ puzzles 
+    --mapM solveAndShow $ puzzles 
+    mapM debug $ puzzles 
     --debug $ readPuzzle "380000000000400785009020300060090000800302009000040070001070500495006000000000092"
