@@ -377,6 +377,29 @@ eliminateForPointingPairsInUnit f n pg =
   in
     pg
 
+{-
+ - What follows is the "strategy" section.  A "strategy" is a known technique
+ - for eliminating possibilities from cells.  The solver works by seeding all
+ - cells with all possible values, "solving" the cells in the initial test
+ - input, and then iteratively removing possible values from the remaining
+ - "unsolved" cells based on deductions made from the configuration of the
+ - board.  This is done by "strategy functions," which all have the signature
+ - [[Int]] -> [[Int]] - that is, they take in a puzzle grid and return a(n
+ - updated) puzzle grid.  Lots of strategies use the concept of a "unit" -
+ - which is a cluster of cells that are constrained to have only one value from
+ - 1,2,3,4,5,6,7,8,9 each.  So - "unit" means either row, column or box.  For
+ - that reason, lots of strategies have an abstracted version that operates on
+ - the "unit" level, and they work by passing in a function to the abstracted
+ - "unit"-level function that is responsible for getting the indexes relevant
+ - to the unit currently being operated on.  For example,
+ - eliminateForLastRemainingInBox is a function that uses
+ - eliminateForLastRemainingInUnit to implement the "eliminate for last
+ - remaining" strategy at the box level.  Given a number indicating a box and a
+ - puzzle grid, it applies the "elminate for last remaining" strategy to that
+ - box.  This is called from the eliminateForLastRemainingInBoxStrategy
+ - function, which takes responsibility for making further deductions about the
+ - puzzle based on the result of that.
+ -}
 eliminateForNakedPairsInUnit :: (Int -> [Int]) -> Int -> [[Int]] -> [[Int]]
 eliminateForNakedPairsInUnit f n pg =
   let
@@ -469,6 +492,8 @@ getCoordinatesFromIndex i = (i `div` 9, i `mod` 9)
 getIndexFromCoordinates :: (Int,Int) -> Int
 getIndexFromCoordinates (i,j) = (i*9) + j
 
+--printGrid takes a puzzle and converts it to a string in which the cells are
+--laid out in rows and separated into boxes
 printGrid :: [[Int]] -> [Char]
 printGrid = (foldr (++) "") . renderGridLine . gridNumbers
 
