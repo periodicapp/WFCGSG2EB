@@ -25,3 +25,7 @@ As of 09/2022 solutions were created in [Python 3.10.1](https://www.python.org/d
    2. 2 Solutions to [In-Order BST Traversing](https://leetcode.com/problems/binary-tree-inorder-traversal/)
       1. inorderTraversalRecur: Standard recursive way of traversing a BST in order from left to right
       2. inorderTraversal: Non-Recursive implementation utilizing the [Morris Traversal Algorithm](https://www.educative.io/answers/what-is-morris-traversalter)
+4. *[Week4.py](Week4.py) - 2022-10-07 - [Sudoku](https://leetcode.com/problems/sudoku-solver)*
+   1. 2 Solutions for the Easy Leetcode Problem: [Every Column has Every Number](https://leetcode.com/problems/check-if-every-row-and-column-contains-all-numbers/)
+   2. 1 Solution for the Medium Problem: [Valid Sudoku](https://leetcode.com/problems/valid-sudoku/)
+   3. 1 somewhat incomplete solution for Hard Problem: [Sudoku Solver](https://leetcode.com/problems/sudoku-solver)
