@@ -125,5 +125,7 @@ class Solution:
         return a
 
 a = Solution()
-for x in a.generateTrees(8):
+# for x in a.generateTrees(3):
+#     print(x)
+for x in a.generateTreesNonUnique(3):
     print(x)
