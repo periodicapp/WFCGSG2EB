@@ -8,8 +8,15 @@ func main() {
 	inputMatrix := [][]int{
 		{1, 2, 3}, {3, 1, 2}, {2, 3, 1},
 	}
+	
+	inputMatrix1 := [][]int{
+		{1, 1, 1}, {1, 2, 3}, {1, 2, 3},
+	}
 
 	fmt.Println(checkValid(inputMatrix))
+	
+	fmt.Println(checkValid(inputMatrix1))
+
 }
 func checkValid(matrix [][]int) bool {
 	matrixLen := len(matrix)
