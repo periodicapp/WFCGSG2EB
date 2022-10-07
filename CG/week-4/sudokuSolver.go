@@ -4,7 +4,7 @@ import(
 	"fmt"
 )
 
-var masterList = [9]byte{'1', '2', '3', '4', '5', '6', '7', '8', '9'}
+// This is used in trying to figure out what options are in a row/col/subsquare
 var fillMap = map[byte]bool{
     '1': true,
     '2': true,
@@ -36,17 +36,22 @@ func main() {
 }
 
 func solveSudoku(board [][]byte)  {
+		// If the board has empties, keep solving
     for !boardIsSolved(board) {
+				// Find all possible options for each space
         possibilitiesMap = generateAllPossibilities(board)
+				// Solve spaces that have a single option and do it again
         board = solveSinglePossiblities(board, possibilitiesMap)
         printBoard(board)
     }
 }
 
+// Return a map with grid indices mapped to an array of options for that space
 func generateAllPossibilities(board [][]byte) map[[2]int][]byte {
     returnMap := make(map[[2]int][]byte)
     for i, row := range board {
         for j, _ := range row {
+						// If the space has a blank, then get the possibilities
             if board[i][j] == placeholder {
                 key := [2]int{i, j}
                 returnMap[key] = getPossibilitiesForSpace(board, i, j)
@@ -56,6 +61,7 @@ func generateAllPossibilities(board [][]byte) map[[2]int][]byte {
     return returnMap
 }
 
+// Get the possibilities for the relevant row/column/subsquare and return the intersection
 func getPossibilitiesForSpace(board [][]byte, row, col int) []byte {
     missingFromRow := getMissing(board[row])
     missingFromCol := getMissing(getCol(board, col))
@@ -63,6 +69,7 @@ func getPossibilitiesForSpace(board [][]byte, row, col int) []byte {
     return getIntersection(missingFromRow, missingFromCol, missingFromSq)
 }
 
+// Given an array of nums, return an array of bytes with the missing nums (1-9)
 func getMissing(list []byte) []byte {
     fillMapCopy := make(map[byte]bool)
     missing := make([]byte, 0)
@@ -80,6 +87,7 @@ func getMissing(list []byte) []byte {
     return missing
 }
 
+// Given a board, and a col index, assembly an []byte of the nums in the column
 func getCol(board [][]byte, col int) []byte {
     column := make([]byte, 0)
     for i := 0; i < 9; i++ {
@@ -88,6 +96,7 @@ func getCol(board [][]byte, col int) []byte {
     return column
 }
 
+// Given coordinates, get the nearest subsquare
 func getSquare(board [][]byte, row, col int) []byte {
     for row % 3 != 0 {
         row--
@@ -104,6 +113,7 @@ func getSquare(board [][]byte, row, col int) []byte {
     return subsquare
 }
 
+// Given 3 arrays, return the intersection of them
 func getIntersection(row, col, sq []byte) []byte {
     trackMap := make(map[byte]int)
     intersection := make([]byte, 0)
@@ -124,6 +134,8 @@ func getIntersection(row, col, sq []byte) []byte {
     return intersection
 }
 
+// Take a board and a map of possibilities, and solve all the spaces for which there is only 
+// one possibility
 func solveSinglePossiblities(board [][]byte, possibilities map[[2]int][]byte) [][]byte {
     newBoard := board
     for k, v := range possibilities {
@@ -134,6 +146,7 @@ func solveSinglePossiblities(board [][]byte, possibilities map[[2]int][]byte) []
     return newBoard
 }
 
+// If empties exist on the board, return false, otherwise true
 func boardIsSolved(board [][]byte) bool {
     for i, row := range board {
         for j, _ := range row {
@@ -145,6 +158,7 @@ func boardIsSolved(board [][]byte) bool {
     return true
 }
 
+// Print out a map that has []byte as the value stringified for easy reading
 func printMap(m map[[2]int][]byte) {
     for k, v := range m {
         fmt.Print(k)
@@ -153,65 +167,14 @@ func printMap(m map[[2]int][]byte) {
     }
 }
 
-///////////////////////////////////////////////////////////////////////
-// Here down is the medium puzzle that is used to check valid boards //
-///////////////////////////////////////////////////////////////////////
-
-func isValidSudoku(board [][]byte) bool {
-    for i, row := range board {
-        rowPass := check(row)
-        if !rowPass {
-            return false
-        }
-        col := make([]byte, 0)
-        for j, _ := range row {
-            col = append(col, board[j][i])
-            if (i % 3 == 0) && (j % 3 == 0) {
-                subsquarePass := checkSubsquare(i, j, board)
-                if !subsquarePass {
-                    return false
-                }
-            }
-        }
-        colPass := check(col)
-        if !colPass {
-            return false
-        }
-    }
-    return true
-}
-
-func checkSubsquare(row, col int, board [][]byte) bool {
-    subsquare := make([]byte, 0)
-    for i := 0; i < 3; i++ {
-        for j := 0; j < 3; j++ {
-            subsquare = append(subsquare, board[row + i][col + j])
-        }
-    }
-    return check(subsquare)
-}
-
-func check(candidate []byte) bool {
-    itemMap := make(map[byte]bool)
-    var placeholder byte = '.'
-    for _, e := range candidate {
-        keyok, _ := itemMap[e]
-        if keyok && e != placeholder {
-            return false
-        } else {
-            itemMap[e] = true
-        }
-    }
-    return true
-}
-
 func printBoard(board [][]byte) {
-    fmt.Println()
-	for _, row := range board {
-		for j, _ := range row {
-			fmt.Printf(" %s ", string(row[j]))
-		}
-		fmt.Println()
+	fmt.Println()
+for _, row := range board {
+	for j, _ := range row {
+		fmt.Printf(" %s ", string(row[j]))
 	}
-    fmt.Println()
+	fmt.Println()
 }
+	fmt.Println()
+}
+
