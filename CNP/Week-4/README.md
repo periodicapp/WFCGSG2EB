@@ -1,7 +1,8 @@
 # Week 4
 
 ## Coding Challenge: 
- 2133. Check if Every Row and Column Contains All Numbers
+Check if Every Row and Column Contains All Numbers [Easy]
+
 ### Details:
 Summary: Includes solution involving hashmaps
 
