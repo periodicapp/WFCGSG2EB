@@ -36,14 +36,25 @@ func main() {
 }
 
 func solveSudoku(board [][]byte)  {
+		failure := false
 		// If the board has empties, keep solving
     for !boardIsSolved(board) {
 				// Find all possible options for each space
-        possibilitiesMap = generateAllPossibilities(board)
-				// Solve spaces that have a single option and do it again
-        board = solveSinglePossiblities(board, possibilitiesMap)
-        printBoard(board)
+				possibilitiesMap = generateAllPossibilities(board)
+				if singlePossibilitiesExist(possibilitiesMap) {
+					// Solve spaces that have a single option and do it again
+					board = solveSinglePossiblities(board, possibilitiesMap)
+					printBoard(board)
+				} else {
+					failure = true
+					break
+				}
     }
+		if failure {
+			fmt.Println("Could not solve this puzzle")
+		} else {
+			fmt.Println("Puzzle solved")
+		}
 }
 
 // Return a map with grid indices mapped to an array of options for that space
@@ -144,6 +155,16 @@ func solveSinglePossiblities(board [][]byte, possibilities map[[2]int][]byte) []
         }
     }
     return newBoard
+}
+
+// Given a map of possibilties, return true if any have a single option
+func singlePossibilitiesExist(m map[[2]int][]byte) bool {
+	for _, v := range m {
+			if len(v) == 1 {
+					return true
+			}
+	}
+	return false
 }
 
 // If empties exist on the board, return false, otherwise true
