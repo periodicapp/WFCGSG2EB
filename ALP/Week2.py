@@ -1,3 +1,6 @@
+import time
+
+
 class Solution:
     # Brute Force
     def longestPalindromeBrute(self, s: str) -> str:
@@ -66,5 +69,8 @@ print(a.longestPalindromeBrute("aacadkbacaa"))
 print(a.longestPalindromeBrute("aabdhudehewopdk"))
 print(a.longestPalindromeBrute("dhwpkwqjaahuwehiewklwq"))
 test = ''.join(['o' for x in range(1700)])
-print(a.longestPalindromeBrute(test))
+#print(a.longestPalindromeBrute(test))
 print(a.longestPalindrome(test))
+start_time = time.time()
+print(a.longestPalindrome("fmitmmdqnpqqjjljpdplsemrvswqkaibctnvwcznilnfxaabwqdcuocuqespfmvkpalxfffozbjgfooeotuwxyutfetcixrqjswbfmadsrxpgpgwslspujoxaaoqfhdopgbtceaqysgwafsgrktsdimbbetnficmsvbmbcdisrajkzduyakjeehaeqsnjgzwfekezulzzluzekefwzgjnsqeaheejkayudzkjarsidcbmbvsmcifntebbmidstkrgsfawgsyqaectbgpodhfqoaaxojupslswgpgpxrsdamfbwsjqrxicteftuyxwutoeoofgjbzofffxlapkvmfpsequcoucdqwbaaxfnlinzcwvntcbiakqwsvrmeslpdpjljjqqpnqdmmtimffmitmmdqnpqqjjljpdplsemrvswqkaibctnvwcznilnfxaabwqdcuocuqespfmvkpalxfffozbjgfooeotuwxyutfetcixrqjswbfmadsrxpgpgwslspujoxaaoqfhdopgbtceaqysgwafsgrktsdimbbetnficmsvbmbcdisrajkzduyakjeehaeqsnjgzwfekezulzzluzekefwzgjnsqeaheejkayudzkjarsidcbmbvsmcifntebbmidstkrgsfawgsyqaectbgpodhfqoaaxojupslswgpgpxrsdamfbwsjqrxicteftuyxwutoeoofgjbzofffxlapkvmfpsequcoucdqwbaaxfnlinzcwvntcbiakqwsvrmeslpdpjljjqqpnqdmmtimfpadding"))
+print("--- %s seconds ---" % (time.time() - start_time))

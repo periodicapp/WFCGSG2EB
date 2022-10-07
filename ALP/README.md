@@ -18,3 +18,10 @@ As of 09/2022 solutions were created in [Python 3.10.1](https://www.python.org/d
    1. Contains 2 solutions to [Longest Palindrome](https://leetcode.com/problems/longest-palindromic-substring/solution/)
       1. Brute Force Algorithm
       2. LeetCode's "Dynamic Programming" Algorithm
+3. *[Week3.py](Week3.py) - 2022-09-30 - [Unique Binary Search Trees](https://leetcode.com/problems/unique-binary-search-trees-ii)*
+   1. 1.5 solutions to [Unique Binary Search Trees](https://leetcode.com/problems/unique-binary-search-trees-ii)
+      1. generateTreesNonUnique: Generates lists of every possible combination of a range from (1, ..., n) then builds binary trees for all of them, but some trees are non-unique. Mostly just included this one for the recursive combinations helper I created.
+      2. generateTrees: Contains a recursive helper that generates structurally-unique trees from the given start and end ranges.
+   2. 2 Solutions to [In-Order BST Traversing](https://leetcode.com/problems/binary-tree-inorder-traversal/)
+      1. inorderTraversalRecur: Standard recursive way of traversing a BST in order from left to right
+      2. inorderTraversal: Non-Recursive implementation utilizing the [Morris Traversal Algorithm](https://www.educative.io/answers/what-is-morris-traversalter)
