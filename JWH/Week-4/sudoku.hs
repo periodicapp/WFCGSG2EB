@@ -1,5 +1,5 @@
 import Data.Char (digitToInt, intToDigit, chr)
-import Data.List (intersperse)
+import Data.List (intersperse, sort)
 
 intersection :: (Eq a) => [a] -> [a] -> [a]
 intersection xs ys = [y | y <- ys, y `elem` xs]
@@ -80,6 +80,46 @@ convertString = map digitToInt
 gridNumbers :: [[Int]] -> [Int]
 gridNumbers pg = map head pg
 
+--unitIsSolved takes a function that fetches a unit (row, column or box) from a
+--grid based on the index it's given, and a grid, and an index and applies the
+--function.  Then it sorts the result and checks whether it's equal to
+--[1,2,3,4,5,6,7,8,9].  If it is, the unit is solved.  If not, it's not.
+unitIsSolved :: ([Int] -> Int -> [Int]) -> [Int] -> Int -> Bool
+unitIsSolved f pg i = (sort $ f pg i) == [1..9]
+
+rowIsSolved :: [Int] -> Int -> Bool
+rowIsSolved = unitIsSolved getRow
+
+columnIsSolved :: [Int] -> Int -> Bool
+columnIsSolved = unitIsSolved getColumn
+
+boxIsSolved :: [Int] -> Int -> Bool
+boxIsSolved = unitIsSolved getBox
+
+--isSolved takes a puzzle grid and returns True if it is solved, False
+--otherwise.  It does this by first converting it to just a grid of numbers,
+--then checking whether all rows, 0-8, are solved, and whether all columns,
+--0-8, are solved, and whether all boxes, 0-8, are solved
+isSolved :: [[Int]] -> Bool
+isSolved pg =
+  let 
+    grd = gridNumbers pg
+    allrows = all (rowIsSolved grd) [0..8]
+    allcolumns = all (columnIsSolved grd) [0..8]
+    allboxes = all (boxIsSolved grd) [0..8]
+  in
+    allrows && allcolumns && allBoxes
+
+
+--rowIsSolved :: [Int] -> Int -> Bool
+--rowIsSolved pg i = 
+--  let
+--    indexes = getIndexesForRow(i*9)
+--    fetchers = map (\x -> \y -> y !! x) indexes
+--    items = sort $ map (\x -> x pg) fetchers
+--  in
+--    items == [1..9]
+    
 --readPuzzle takes an input string representing a puzzle and returns the
 --cleaned-up representation of the puzzle as a list of lists of integers
 readPuzzle :: [Char] -> [[Int]] 
@@ -382,15 +422,15 @@ eliminateForNakedPairsInColumnStrategy pg = iterateUntilEqual (\x -> eliminateFo
 getRow :: [Int] -> Int -> [Int]
 getRow grd i = getItemsAtIndexes grd (getIndexesForRow (i*9))
 
-getRowCells :: [[Int]] -> Int -> [[Int]]
-getRowCells pg i = getItemsAtIndexes pg (getIndexesForRow (i*9))
-
 getColumn :: [Int] -> Int -> [Int]
 getColumn grd i = getItemsAtIndexes grd (getIndexesForColumn i)
 
 getGrid :: [Int] -> (Int,Int) -> [Int]
 getGrid grd (row,column) = getItemsAtIndexes grd (getIndexesForBox (row,column))
     
+getBox :: [Int] -> Int -> [Int]
+getBox grd i = getItemsAtIndexes grd (getIndexesForBoxNumber i)
+
 --getCoordinatesFromIndex - given the index of a cell in an array-of-cells
 --representation of a puzzle, return the (row,column) tuple for that cell
 getCoordinatesFromIndex :: Int -> (Int,Int)
@@ -449,6 +489,7 @@ debug pz = do
   print_rows seventh_pass
   putStrLn "\n\n"
   print $ isComplete seventh_pass
+  print $ isSolved seventh_pass
   putStrLn "\n\n"
 
 main = 
