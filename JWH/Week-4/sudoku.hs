@@ -108,7 +108,7 @@ isSolved pg =
     allcolumns = all (columnIsSolved grd) [0..8]
     allboxes = all (boxIsSolved grd) [0..8]
   in
-    allrows && allcolumns && allBoxes
+    allrows && allcolumns && allboxes
 
 
 --rowIsSolved :: [Int] -> Int -> Bool
@@ -330,13 +330,13 @@ findRepeatedPossibilities (x:xs) = if any (possibilitiesEq x) xs then x : findRe
 findNakedPairs :: [[Int]] -> [[Int]]
 findNakedPairs cells = findRepeatedPossibilities $ (filter (\x -> length x == 3) cells)
 
--- NEXT
--- 1. eliminateForNakedPairsInUnit - use findNakedPairs to find the cell tails for a naked pair in the unit
--- 2. use removeItems to implement a function that removes the items from all peer cells IFF the peer cell doesnt have exactly the same items
--- 3. NOTE: will need a function that detects "exactly the same."  Probably it's OK to just use == since all possibilities lists are sorted at inception and nothing disturbs the order
--- FINISH eliminateForNakedPairsInUnit (immediately below)
---
-
+--eliminateNakedPairFromCell - takes a list of Int representing a "naked pair"
+--that's been discovered.  (In practice, this will be a list of exactly two
+--numbers.)  Then, takes a list of Int representing a cell.  If the pair is
+--equal to the tail of the cell, leave it alone because this is one of the
+--cells that identified the pair (i.e. this is one of the cells that *must*
+--have one of these two values as its solution value)!  Otherwise, remove the
+--two values from the possibilities list of the cell.
 eliminateNakedPairFromCell :: [Int] -> [Int] -> [Int]
 eliminateNakedPairFromCell pair cell 
   | cell == [] = []
@@ -344,11 +344,38 @@ eliminateNakedPairFromCell pair cell
   | pair == (tail cell) = cell
   | otherwise = (head cell) : (removeItems pair (tail cell))
 
+--eliminateNakedPairFromIndexes - takes a list of indexes ([Int]) and an int
+--representing the current place in the iteration loop, and a list of Int
+--representing an identified "naked pair" (in practice, this will be a list of
+--exactly two Ints) and then a list of cells which are candidates for having
+--their possibilities list reduced by the pair.  Cells in the list are EITHER
+--(a) cells which form the "naked pair" (there should be exactly two of these)
+--and so should NOT have the pair removed from their possibilities list or (b)
+--cells which do not form the "naked pair" and so should have both items in the
+--pair removed from their possibilities list.  This uses the helper function
+--eliminateNakedPairFromIndexes to both tell which is which and apply the
+--reduction where appropriate.
 eliminateNakedPairFromIndexes :: [Int] -> Int -> [Int] -> [[Int]] -> [[Int]]
 eliminateNakedPairFromIndexes _ _ _ [] = []
 eliminateNakedPairFromIndexes idxs current pair (cell:cells)
   | current `elem` idxs = (eliminateNakedPairFromCell pair cell) : eliminateNakedPairFromIndexes idxs (current+1) pair cells
   | otherwise = cell : eliminateNakedPairFromIndexes idxs (current+1) pair cells
+
+--PLACEHOLDER
+--NEXT
+--1. implement findPointingPairs - note that this will need to preserve indexes
+--2. implement functions that can reconstruct the OTHER unit indexes might be a member of.  
+--3. If they turn out to be in another unit, eliminate the pair from that unit
+--4. Probably best to do (3) with a "remove unit but spare these indexes" type of function
+--
+eliminateForPointingPairsInUnit :: (Int -> [Int]) -> Int -> [[Int]] -> [[Int]]
+eliminateForPointingPairsInUnit f n pg = 
+  let 
+    indexes = f n
+    cells = getItemsAtIndexes pg indexes
+    --pointingpairs = map tail $ findPointingPairs cells
+  in
+    pg
 
 eliminateForNakedPairsInUnit :: (Int -> [Int]) -> Int -> [[Int]] -> [[Int]]
 eliminateForNakedPairsInUnit f n pg =
@@ -448,11 +475,12 @@ printGrid = (foldr (++) "") . renderGridLine . gridNumbers
 solveAndShow :: [[Int]] -> IO ()
 solveAndShow pz = do
   putStrLn . printGrid $ pz
-  let fullsolution = eliminateForNakedPairsInBoxStrategy . eliminateForNakedPairsInColumnStrategy . eliminateForNakedPairsInRowStrategy . eliminateForLastRemainingInBoxStrategy .  eliminateForLastRemainingInColumnStrategy . eliminateForLastRemainingInRowStrategy . eliminateForSolvedCellsStrategy $ pz
+  let fullsolution = eliminateForLastRemainingInBoxStrategy . eliminateForLastRemainingInColumnStrategy . eliminateForLastRemainingInRowStrategy . eliminateForNakedPairsInBoxStrategy . eliminateForNakedPairsInColumnStrategy . eliminateForNakedPairsInRowStrategy . eliminateForLastRemainingInBoxStrategy .  eliminateForLastRemainingInColumnStrategy . eliminateForLastRemainingInRowStrategy . eliminateForSolvedCellsStrategy $ pz
   putStrLn . printGrid $ fullsolution
   print_rows fullsolution
   putStrLn "\n"
   print $ isComplete $ fullsolution
+  print $ isSolved $ fullsolution
   putStrLn "\n\n"
 
 print_rows pz = do
@@ -467,6 +495,9 @@ debug pz = do
   let fifth_pass = eliminateForNakedPairsInRowStrategy fourth_pass
   let sixth_pass = eliminateForNakedPairsInColumnStrategy fifth_pass
   let seventh_pass = eliminateForNakedPairsInBoxStrategy sixth_pass
+  let eighth_pass = eliminateForLastRemainingInRowStrategy seventh_pass
+  let ninth_pass = eliminateForLastRemainingInColumnStrategy eighth_pass
+  let tenth_pass = eliminateForLastRemainingInBoxStrategy ninth_pass
   putStrLn . printGrid $ first_pass
   print_rows first_pass
   putStrLn "\n\n"
@@ -488,14 +519,23 @@ debug pz = do
   putStrLn . printGrid $ seventh_pass
   print_rows seventh_pass
   putStrLn "\n\n"
-  print $ isComplete seventh_pass
-  print $ isSolved seventh_pass
+  putStrLn . printGrid $ eighth_pass
+  print_rows eighth_pass
+  putStrLn "\n\n"
+  putStrLn . printGrid $ ninth_pass
+  print_rows ninth_pass
+  putStrLn "\n\n"
+  putStrLn . printGrid $ tenth_pass
+  print_rows tenth_pass
+  putStrLn "\n\n"
+  print $ isComplete tenth_pass
+  print $ isSolved tenth_pass
   putStrLn "\n\n"
 
 main = 
   do
     input <- readFile "easy50.txt"
     let puzzles = map readPuzzle $ lines input
-    --mapM solveAndShow $ puzzles 
-    mapM debug $ puzzles 
+    mapM solveAndShow $ puzzles 
+    --mapM debug $ puzzles 
     --debug $ readPuzzle "380000000000400785009020300060090000800302009000040070001070500495006000000000092"
