@@ -8,6 +8,8 @@ Summary: Includes solution involving hashmaps
 
 LeetCode Problem(s): https://leetcode.com/problems/check-if-every-row-and-column-contains-all-numbers/
 
+LeetCode Submission: https://leetcode.com/submissions/detail/817398577/
+
 Language: Golang
 
 User: Chris Page
