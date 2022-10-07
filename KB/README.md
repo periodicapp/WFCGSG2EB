@@ -10,3 +10,6 @@ Solutions for WFCGSG2EB problems by Karthik Bangera
     tracked indices
 1. *Week 3 - 2022-09-30 - Inorder traversal of binary search tree*: 
     1. `inorderbst.go` - Builds the binary search tree from the input and uses recursion to traverse the BST inorder i.e left root right
+1. *Week 4 - 2022-10-07 - Determine if a 9 x 9 Sudoku board is valid or not*: 
+    1. `validsudoku.go` - Traverses 9 rows, 9 columns and the individual 3x3 grid. Each traversal builds a bool array that keeps track of, if the number has been
+    seen or not during the traversal. If there is a repetition return false else return true
