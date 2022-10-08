@@ -440,8 +440,27 @@ eliminateForPointingPairsInUnit f n pg =
  - puzzle based on the result of that.
  -}
 
+getNextUnsolvedCell :: [[Int]] -> (Int,[Int])
+getNextUnsolvedCell pg = gnuc $ zip [0..] pg
+  where
+    gnuc [] = (82,[])
+    gnuc ((i,ps):pss) = if (length ps) > 1 then (i,ps) else gnuc pss
+
+gateSolution :: [[[Int]]] -> Maybe [[Int]]
+gateSolution [] = Nothing
+gateSolution (pg:pgs) = 
+  case applyBacktrackingStrategy pg of
+    (Just x) -> Just x
+    Nothing -> gateSolution pgs
+
 applyNextCell :: [[Int]] -> Maybe [[Int]]
-applyNextCell pg = Just pg
+applyNextCell pg = 
+  let
+    nextunsolved = getNextUnsolvedCell pg
+    index = fst nextunsolved
+    possibilities = tail . snd $ nextunsolved
+  in
+    if index == 82 then Nothing else gateSolution $ map (\x -> solveCellForNumberAtIndex pg x index) possibilities
 
 applyBacktrackingStrategy :: [[Int]] -> Maybe [[Int]]
 applyBacktrackingStrategy pg
@@ -609,16 +628,19 @@ debug pz = do
   print $ isSolved tenth_pass
   putStrLn "\n\n"
 
-checkvalid pz = do
+solveBacktracking pz = do
   putStrLn . printGrid $ pz
-  print $ isValid pz
+  let solved = applyBacktrackingStrategy pz
+  print $ solved
+  putStrLn "\n\n"
 
 main = 
   do
-    input <- readFile "someinvalid.txt"
-    --input <- readFile "easy50.txt"
+    --input <- readFile "someinvalid.txt"
+    input <- readFile "easy50.txt"
     let puzzles = map readPuzzle $ lines input
+    mapM solveBacktracking $ puzzles 
     --mapM solveAndShow $ puzzles 
-    mapM checkvalid $ puzzles 
     --mapM debug $ puzzles 
     --debug $ readPuzzle "380000000000400785009020300060090000800302009000040070001070500495006000000000092"
+    --solveBacktracking $ readPuzzle "100920000524010000000000070050008102000000000402700090060000000000030945000071006"
