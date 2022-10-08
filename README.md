@@ -13,6 +13,7 @@ Each participant should create a folder and store their entries there.  The fold
 1. *Week 2 - 2022-09-23 - Longest Palindrome Substring* - Solve either [Palindrome Number](https://leetcode.com/problems/palindrome-number/) (**EASY**) or [Longest Palindrome Substring](https://leetcode.com/problems/longest-palindromic-substring/) (**MEDIUM**) according to the instructions on LeetCode.
 1. *Week 3 - 2022-09-30 - Unique Binary Search Trees* - Solve either [Binary Tree In Order Traversal](https://leetcode.com/problems/binary-tree-inorder-traversal/) (**EASY**) or [Unique Binary Search Trees II](https://leetcode.com/problems/unique-binary-search-trees-ii/) (**MEDIUM**) according to the instructions on LeetCode.
 1. *Week 4 - 2022-10-07 - Sudoku* - Solve either [Check if Every Row and Column Contains All Numbers](https://leetcode.com/problems/check-if-every-row-and-column-contains-all-numbers/) (**EASY**) or [Valid Sudoku](https://leetcode.com/problems/valid-sudoku/) (**MEDIUM**) or [Sudoku Solver](https://leetcode.com/problems/sudoku-solver/) (**HARD**) according to the instructions on LeetCode.
+1. *Week 5 - 2022-10-14 - Stonks* - Solve either [Best Time to Buy and Sell Stock](https://leetcode.com/problems/best-time-to-buy-and-sell-stock/) (**EASY**) or [Best Time to Buy and Sell Stock II](https://leetcode.com/problems/best-time-to-buy-and-sell-stock-ii/) (**MEDIUM**) or [Best Time to Buy and Sell Stock III](https://leetcode.com/problems/best-time-to-buy-and-sell-stock-iii/) (**HARD**) according to the instructions on LeetCode.
 
 ## Resources
 
