@@ -87,14 +87,30 @@ gridNumbers pg = map head pg
 unitIsSolved :: ([Int] -> Int -> [Int]) -> [Int] -> Int -> Bool
 unitIsSolved f pg i = (sort $ f pg i) == [1..9]
 
+--unitIsValid takes a function that fetches a unit (row, column or box) from a
+--grid based on the index it's givn, and a grid, and an index, and applies the
+--function.  Then it checks whether all the cell values returned are unique
+--(barring 0).  If they are, the unit is valid.
+unitIsValid :: ([Int] -> Int -> [Int]) -> [Int] -> Int -> Bool
+unitIsValid f pg i = (allUniq $ f pg i) 
+
 rowIsSolved :: [Int] -> Int -> Bool
 rowIsSolved = unitIsSolved getRow
+
+rowIsValid :: [Int] -> Int -> Bool
+rowIsValid = unitIsValid getRow
 
 columnIsSolved :: [Int] -> Int -> Bool
 columnIsSolved = unitIsSolved getColumn
 
+columnIsValid :: [Int] -> Int -> Bool
+columnIsValid = unitIsValid getColumn
+
 boxIsSolved :: [Int] -> Int -> Bool
 boxIsSolved = unitIsSolved getBox
+
+boxIsValid :: [Int] -> Int -> Bool
+boxIsValid = unitIsValid getBox
 
 --isSolved takes a puzzle grid and returns True if it is solved, False
 --otherwise.  It does this by first converting it to just a grid of numbers,
@@ -110,16 +126,29 @@ isSolved pg =
   in
     allrows && allcolumns && allboxes
 
+--allUniq takes a list of integers (representing cell values for a unit) and
+--checks that there are no duplicates in the list other than 0 (which
+--represents an unsolved cell and so doesnt count for validity checks)
+allUniq :: [Int] -> Bool
+allUniq [] = True
+allUniq (x:xs)
+  | x == 0 = allUniq xs
+  | x `elem` xs = False
+  |otherwise = allUniq xs
 
---rowIsSolved :: [Int] -> Int -> Bool
---rowIsSolved pg i = 
---  let
---    indexes = getIndexesForRow(i*9)
---    fetchers = map (\x -> \y -> y !! x) indexes
---    items = sort $ map (\x -> x pg) fetchers
---  in
---    items == [1..9]
-    
+--isValid takes a (potentially unsolved) puzzle grid and determines whether all
+--the constraints on the rows, columns and boxes are honored
+isValid :: [[Int]] -> Bool
+isValid pg =
+  let
+    pgs = gridNumbers pg
+    allrows = all (rowIsValid pgs) [0..8]
+    allcolumns = all (columnIsValid pgs) [0..8]
+    allboxes = all (boxIsValid pgs) [0..8]
+  in
+    allrows && allcolumns && allboxes
+
+
 --readPuzzle takes an input string representing a puzzle and returns the
 --cleaned-up representation of the puzzle as a list of lists of integers
 readPuzzle :: [Char] -> [[Int]] 
@@ -414,19 +443,6 @@ eliminateForPointingPairsInUnit f n pg =
 applyNextCell :: [[Int]] -> Maybe [[Int]]
 applyNextCell pg = Just pg
 
---allUniq takes a list of integers (representing cell values for a unit) and
---checks that there are no duplicates in the list other than 0 (which
---represents an unsolved cell and so doesnt count for validity checks)
-allUniq :: [Int] -> Bool
-allUniq [] = True
-allUniq (x:xs)
-  | x `elem` xs = False
-  | x == 0 = allUniq xs
-  |otherwise = allUniq xs
-
-isValid :: [[Int]] -> Bool
-isValid pg = True
-
 applyBacktrackingStrategy :: [[Int]] -> Maybe [[Int]]
 applyBacktrackingStrategy pg
   | (isValid pgs) && (isComplete pgs) = Just pgs
@@ -593,10 +609,16 @@ debug pz = do
   print $ isSolved tenth_pass
   putStrLn "\n\n"
 
+checkvalid pz = do
+  putStrLn . printGrid $ pz
+  print $ isValid pz
+
 main = 
   do
-    input <- readFile "easy50.txt"
+    input <- readFile "someinvalid.txt"
+    --input <- readFile "easy50.txt"
     let puzzles = map readPuzzle $ lines input
-    mapM solveAndShow $ puzzles 
+    --mapM solveAndShow $ puzzles 
+    mapM checkvalid $ puzzles 
     --mapM debug $ puzzles 
     --debug $ readPuzzle "380000000000400785009020300060090000800302009000040070001070500495006000000000092"
