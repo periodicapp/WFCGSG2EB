@@ -1,9 +1,6 @@
 import Data.Char (digitToInt, intToDigit, chr)
 import Data.List (intersperse, sort)
 
-intersection :: (Eq a) => [a] -> [a] -> [a]
-intersection xs ys = [y | y <- ys, y `elem` xs]
-  
 --initGrid takes a list of integers representing an unsolved Sudoku puzzle (all
 --solved cells should be 1-9, with 0 standing in for an unsolved cell) and
 --converts it to a list of lists of integers, each of whcih is 10 items long.
@@ -255,34 +252,10 @@ getSolvedIndexes pg = gsi 0 pg
    gsi n [] = []
    gsi n (x:xs) = if (length x) == 1 then (head x,n) : gsi (n+1) xs else gsi (n+1) xs
 
---getUnsolvedIndexes - takes a grid and iterates over it, incrementing an index
---counter each time, returning a list of the indexes of all the elements in the
---grid that are unsolved - i.e. have a possibilities list (meaning their length
---is greater than 1)
-getUnsolvedIndexes :: [[Int]] -> [Int]
-getUnsolvedIndexes pg = gusi 0 pg
-  where
-    gusi _ [] = []
-    gusi n (x:xs) = if (length x) > 1 then n : gusi (n+1) xs else gusi (n+1) xs
-
 --getIndexedCells - given a one-dimensional array representation of a puzzle,
 --return an array of each cell representation paired in a tuple with its index
 getIndexedCells :: [[Int]] -> [(Int,[Int])]
 getIndexedCells = zip [0..]
-
---getPossibleCellsForNumber - given a number (1-9) and a "getIndexedCells"
---representation of the puzzle, return all the cells for which that number is a
---possible value (in the sense of being in the tail of the representation [Int]
---list for that cell)
-getPossibleCellsForNumber :: Int -> [(Int,[Int])] -> [Int]
-getPossibleCellsForNumber _ [] = []
-getPossibleCellsForNumber n ((i,possibilities):rest) = if n `elem` possibilities then i : getPossibleCellsForNumber n rest else getPossibleCellsForNumber n rest 
-
---getPossibleCellsForNumbers - takes a one-dimensional array representation of
---a puzzles and calls "getPossibleCellsForNumber" on it for each number 1-9 -
---i.e. for each possible value of a cell.
-getPossibleCellsForNumbers :: [[Int]] -> [[Int]]
-getPossibleCellsForNumbers pg = map ((flip getPossibleCellsForNumber) (getIndexedCells pg)) [1..9]
 
 --removePossibilityFromCells - given an array-of-cells representation of a
 --puzzle and a list of indexes of cells to affect, and a value to remove,
@@ -335,117 +308,24 @@ eliminateForSolvedCells pg =
     foldr eliminateForSolvedCell pg solvedindexes
 
 
---getSingleOptionNumbers - takes a list of lists of indexes and returns
---pairings of number and index to feed into solveCellForNumberAtIndex - that
---is, it will be a list of tuples the left member of which is a number to put
---in a cell and the right member of which is the index of the cell in the
---array-of-cells puzzle representation.  The input list of lists of indexes is
---arranged in such a way that the list of indexes is at the place in the master
---list that corresponds to the number.  (So, the first list of indexes in the
---list represents the indexes of cells that have 1 as a possible value, the
---next for 2 and so on.)  So, this function just pulls out all the ones that
---are length 1, since if a cell in a context is the only cell that can have
---that number as the value, then it must also have that number as the value.
-getSingleOptionNumbers :: [[Int]] -> [(Int,Int)]
-getSingleOptionNumbers cells = [(num,head idx) | (num,idx) <- (zip [1..] cells), length idx == 1]
-
-
---possibilitiesEq = takes two lists and returns true if their tails are equal.
---This is used to detect cells that are equal in terms of their possibilities
---lists
-possibilitiesEq :: [Int] -> [Int] -> Bool
-possibilitiesEq (x:xs) (y:ys) = xs == ys
-
---findRepeatedPossibilities - takes a list of cells and retains the first of
---any that have a possibilities list that is duplicated by a later cell in the
---list
-findRepeatedPossibilities :: [[Int]] -> [[Int]]
-findRepeatedPossibilities [] = []
-findRepeatedPossibilities (x:xs) = if any (possibilitiesEq x) xs then x : findRepeatedPossibilities xs else findRepeatedPossibilities xs
-
---findNakedPairs - takes a list of lists of Int, each representing a cell in
---the puzzle, and returns the ones that have exactly two remaining items in
---their possibilities list
-findNakedPairs :: [[Int]] -> [[Int]]
-findNakedPairs cells = findRepeatedPossibilities $ (filter (\x -> length x == 3) cells)
-
---eliminateNakedPairFromCell - takes a list of Int representing a "naked pair"
---that's been discovered.  (In practice, this will be a list of exactly two
---numbers.)  Then, takes a list of Int representing a cell.  If the pair is
---equal to the tail of the cell, leave it alone because this is one of the
---cells that identified the pair (i.e. this is one of the cells that *must*
---have one of these two values as its solution value)!  Otherwise, remove the
---two values from the possibilities list of the cell.
-eliminateNakedPairFromCell :: [Int] -> [Int] -> [Int]
-eliminateNakedPairFromCell pair cell 
-  | cell == [] = []
-  | pair == [] = cell
-  | pair == (tail cell) = cell
-  | otherwise = (head cell) : (removeItems pair (tail cell))
-
---eliminateNakedPairFromIndexes - takes a list of indexes ([Int]) and an int
---representing the current place in the iteration loop, and a list of Int
---representing an identified "naked pair" (in practice, this will be a list of
---exactly two Ints) and then a list of cells which are candidates for having
---their possibilities list reduced by the pair.  Cells in the list are EITHER
---(a) cells which form the "naked pair" (there should be exactly two of these)
---and so should NOT have the pair removed from their possibilities list or (b)
---cells which do not form the "naked pair" and so should have both items in the
---pair removed from their possibilities list.  This uses the helper function
---eliminateNakedPairFromIndexes to both tell which is which and apply the
---reduction where appropriate.
-eliminateNakedPairFromIndexes :: [Int] -> Int -> [Int] -> [[Int]] -> [[Int]]
-eliminateNakedPairFromIndexes _ _ _ [] = []
-eliminateNakedPairFromIndexes idxs current pair (cell:cells)
-  | current `elem` idxs = (eliminateNakedPairFromCell pair cell) : eliminateNakedPairFromIndexes idxs (current+1) pair cells
-  | otherwise = cell : eliminateNakedPairFromIndexes idxs (current+1) pair cells
-
---PLACEHOLDER
---NEXT
---1. implement findPointingPairs - note that this will need to preserve indexes
---2. implement functions that can reconstruct the OTHER unit indexes might be a member of.  
---3. If they turn out to be in another unit, eliminate the pair from that unit
---4. Probably best to do (3) with a "remove unit but spare these indexes" type of function
---
-eliminateForPointingPairsInUnit :: (Int -> [Int]) -> Int -> [[Int]] -> [[Int]]
-eliminateForPointingPairsInUnit f n pg = 
-  let 
-    indexes = f n
-    cells = getItemsAtIndexes pg indexes
-    --pointingpairs = map tail $ findPointingPairs cells
-  in
-    pg
-
-{-
- - What follows is the "strategy" section.  A "strategy" is a known technique
- - for eliminating possibilities from cells.  The solver works by seeding all
- - cells with all possible values, "solving" the cells in the initial test
- - input, and then iteratively removing possible values from the remaining
- - "unsolved" cells based on deductions made from the configuration of the
- - board.  This is done by "strategy functions," which all have the signature
- - [[Int]] -> [[Int]] - that is, they take in a puzzle grid and return a(n
- - updated) puzzle grid.  Lots of strategies use the concept of a "unit" -
- - which is a cluster of cells that are constrained to have only one value from
- - 1,2,3,4,5,6,7,8,9 each.  So - "unit" means either row, column or box.  For
- - that reason, lots of strategies have an abstracted version that operates on
- - the "unit" level, and they work by passing in a function to the abstracted
- - "unit"-level function that is responsible for getting the indexes relevant
- - to the unit currently being operated on.  For example,
- - eliminateForLastRemainingInBox is a function that uses
- - eliminateForLastRemainingInUnit to implement the "eliminate for last
- - remaining" strategy at the box level.  Given a number indicating a box and a
- - puzzle grid, it applies the "elminate for last remaining" strategy to that
- - box.  This is called from the eliminateForLastRemainingInBoxStrategy
- - function, which takes responsibility for making further deductions about the
- - puzzle based on the result of that.
- -}
-
+--getNextUnsolvedCell takes an array-of-cells representation of a puzzle and
+--returns the next unsolved cell in the form of a tuple.  The right member of
+--the tuple is the array representation of the cell, and the left member is the
+--index in the array at which it was found.
 getNextUnsolvedCell :: [[Int]] -> (Int,[Int])
 getNextUnsolvedCell pg = gnuc $ zip [0..] pg
   where
     gnuc [] = (82,[])
     gnuc ((i,ps):pss) = if (length ps) > 1 then (i,ps) else gnuc pss
 
+
+--gateSolution implements the branching part of the backtracking algorithm.
+--When we hit an unsolved cell, there will be several possibilities for its
+--value, and we have to try all of them.  Some of them will fail.  This
+--function takes a list of partially-solved puzzle grids and tries each one in
+--turn (by calling applyBacktrackingStrategy on it).  If this results in
+--failure, it goes to the next item in the list.  If it succeeds, we've found a
+--solution, so no need to try any other possibilities; just return it.
 gateSolution :: [[[Int]]] -> Maybe [[Int]]
 gateSolution [] = Nothing
 gateSolution (pg:pgs) = 
@@ -453,6 +333,14 @@ gateSolution (pg:pgs) =
     (Just x) -> Just x
     Nothing -> gateSolution pgs
 
+--applyNextCell works with gateSolution to apply the branching part of the
+--backtracking algorithm.  The whole thing works by taking a partially solved
+--puzzle and finding the next empty/unsolved cell.  Then, for each possible
+--value of that cell, we first apply the value and then call (recursively)
+--applyBacktrackingStrategy on the result of "solving" the cell for that value.
+--This can either succeed or fail, so we "gate" the result with a call to
+--gateSolution to make sure we return early if one of the possibilities
+--generates a path to success.
 applyNextCell :: [[Int]] -> Maybe [[Int]]
 applyNextCell pg = 
   let
@@ -462,6 +350,14 @@ applyNextCell pg =
   in
     if index == 82 then Nothing else gateSolution $ map (\x -> solveCellForNumberAtIndex pg x index) possibilities
 
+--applyBacktrackingStrategy is the driver function.  Takes a puzzle grid,
+--reduces the possibilities on each cell based on what's "solved," and then
+--determies whether the puzzle is already solved.  If so, return it.  If
+--complete but not solved, it's a failure.  If it's valid but not complete,
+--pass it to a function applyNextCell that will recursively call this function
+--on the result of solving the next free/unsolved cell with each remaining
+--possible value for that cell in turn.  This process ends at the first
+--successful solution.
 applyBacktrackingStrategy :: [[Int]] -> Maybe [[Int]]
 applyBacktrackingStrategy pg
   | (isValid pgs) && (isComplete pgs) = Just pgs
@@ -470,43 +366,6 @@ applyBacktrackingStrategy pg
   | otherwise = Nothing
   where
     pgs = eliminateForSolvedCellsStrategy pg
-
-eliminateForNakedPairsInUnit :: (Int -> [Int]) -> Int -> [[Int]] -> [[Int]]
-eliminateForNakedPairsInUnit f n pg =
-  let
-    indexes = f n
-    cells = getItemsAtIndexes pg indexes
-    nakedpairs = map tail $ findNakedPairs cells
-  in
-    if (length nakedpairs) == 0 then pg else foldr (eliminateNakedPairFromIndexes indexes 0) pg nakedpairs
-
-eliminateForLastRemainingInUnit :: (Int -> [Int]) -> Int -> [[Int]] -> [[Int]]
-eliminateForLastRemainingInUnit f n pg = 
-  let
-    possiblecellsbynumber = getPossibleCellsForNumbers pg
-    cellsbybox = f n
-    overlap = map (intersection cellsbybox) possiblecellsbynumber
-    relevant = getSingleOptionNumbers overlap
-  in
-    foldr solveCellForNumberAtIndexTuple pg relevant
-
-eliminateForLastRemainingInBox :: Int -> [[Int]] -> [[Int]]
-eliminateForLastRemainingInBox = eliminateForLastRemainingInUnit getIndexesForBoxNumber
-
-eliminateForLastRemainingInRow :: Int -> [[Int]] -> [[Int]]
-eliminateForLastRemainingInRow = eliminateForLastRemainingInUnit (\x -> getIndexesForRow (x*9))
-
-eliminateForLastRemainingInColumn :: Int -> [[Int]] -> [[Int]]
-eliminateForLastRemainingInColumn = eliminateForLastRemainingInUnit getIndexesForColumn
-
-eliminateForNakedPairsInBox :: Int -> [[Int]] -> [[Int]]
-eliminateForNakedPairsInBox = eliminateForNakedPairsInUnit getIndexesForBoxNumber
-
-eliminateForNakedPairsInRow :: Int -> [[Int]] -> [[Int]]
-eliminateForNakedPairsInRow = eliminateForNakedPairsInUnit (\x -> getIndexesForRow (x*9))
-
-eliminateForNakedPairsInColumn :: Int -> [[Int]] -> [[Int]]
-eliminateForNakedPairsInColumn = eliminateForNakedPairsInUnit getIndexesForColumn
 
 --iterateUntilEqual - is a way of running the same strategy function over a
 --puzzle as long as "needed."  It is used to run the strategy function over the
@@ -521,24 +380,6 @@ iterateUntilEqual f i =
 
 eliminateForSolvedCellsStrategy :: [[Int]] -> [[Int]]
 eliminateForSolvedCellsStrategy pg = iterateUntilEqual (eliminateForSolvedCells . markSolvedCells) pg
-
-eliminateForLastRemainingInBoxStrategy :: [[Int]] -> [[Int]]
-eliminateForLastRemainingInBoxStrategy pg = iterateUntilEqual (\x -> eliminateForSolvedCellsStrategy $ (foldr eliminateForLastRemainingInBox x [0..8])) pg
-
-eliminateForLastRemainingInRowStrategy :: [[Int]] -> [[Int]]
-eliminateForLastRemainingInRowStrategy pg = iterateUntilEqual (\x -> eliminateForSolvedCellsStrategy $ (foldr eliminateForLastRemainingInRow x [0..8])) pg
-
-eliminateForLastRemainingInColumnStrategy :: [[Int]] -> [[Int]]
-eliminateForLastRemainingInColumnStrategy pg = iterateUntilEqual (\x -> eliminateForSolvedCellsStrategy $ (foldr eliminateForLastRemainingInColumn x [0..8])) pg
-
-eliminateForNakedPairsInBoxStrategy :: [[Int]] -> [[Int]]
-eliminateForNakedPairsInBoxStrategy pg = iterateUntilEqual (\x -> eliminateForSolvedCellsStrategy $ (foldr eliminateForNakedPairsInBox x [0..8])) pg
-
-eliminateForNakedPairsInRowStrategy :: [[Int]] -> [[Int]]
-eliminateForNakedPairsInRowStrategy pg = iterateUntilEqual (\x -> eliminateForSolvedCellsStrategy $ (foldr eliminateForNakedPairsInRow x [0..8])) pg
-
-eliminateForNakedPairsInColumnStrategy :: [[Int]] -> [[Int]]
-eliminateForNakedPairsInColumnStrategy pg = iterateUntilEqual (\x -> eliminateForSolvedCellsStrategy $ (foldr eliminateForNakedPairsInColumn x [0..8])) pg
 
 getRow :: [Int] -> Int -> [Int]
 getRow grd i = getItemsAtIndexes grd (getIndexesForRow (i*9))
@@ -557,90 +398,26 @@ getBox grd i = getItemsAtIndexes grd (getIndexesForBoxNumber i)
 getCoordinatesFromIndex :: Int -> (Int,Int)
 getCoordinatesFromIndex i = (i `div` 9, i `mod` 9)
 
---getIndexFromCoordinates - given the (row,column) representation of a cell in
---a puzzle, return the index in the array-of-cells representation it
---corresponds to
-getIndexFromCoordinates :: (Int,Int) -> Int
-getIndexFromCoordinates (i,j) = (i*9) + j
-
 --printGrid takes a puzzle and converts it to a string in which the cells are
 --laid out in rows and separated into boxes
 printGrid :: [[Int]] -> [Char]
 printGrid = (foldr (++) "") . renderGridLine . gridNumbers
 
-solveAndShow :: [[Int]] -> IO ()
-solveAndShow pz = do
-  putStrLn . printGrid $ pz
-  let fullsolution = eliminateForLastRemainingInBoxStrategy . eliminateForLastRemainingInColumnStrategy . eliminateForLastRemainingInRowStrategy . eliminateForNakedPairsInBoxStrategy . eliminateForNakedPairsInColumnStrategy . eliminateForNakedPairsInRowStrategy . eliminateForLastRemainingInBoxStrategy .  eliminateForLastRemainingInColumnStrategy . eliminateForLastRemainingInRowStrategy . eliminateForSolvedCellsStrategy $ pz
-  putStrLn . printGrid $ fullsolution
-  print_rows fullsolution
-  putStrLn "\n"
-  print $ isComplete $ fullsolution
-  print $ isSolved $ fullsolution
-  putStrLn "\n\n"
-
 print_rows pz = do
   mapM print $ chunksOf 9 pz
-
-debug pz = do
-  putStrLn . printGrid $ pz
-  let first_pass = eliminateForSolvedCellsStrategy $ pz
-  let second_pass = eliminateForLastRemainingInBoxStrategy first_pass
-  let third_pass = eliminateForLastRemainingInRowStrategy second_pass
-  let fourth_pass = eliminateForLastRemainingInColumnStrategy third_pass
-  let fifth_pass = eliminateForNakedPairsInRowStrategy fourth_pass
-  let sixth_pass = eliminateForNakedPairsInColumnStrategy fifth_pass
-  let seventh_pass = eliminateForNakedPairsInBoxStrategy sixth_pass
-  let eighth_pass = eliminateForLastRemainingInRowStrategy seventh_pass
-  let ninth_pass = eliminateForLastRemainingInColumnStrategy eighth_pass
-  let tenth_pass = eliminateForLastRemainingInBoxStrategy ninth_pass
-  putStrLn . printGrid $ first_pass
-  print_rows first_pass
-  putStrLn "\n\n"
-  putStrLn . printGrid $ second_pass
-  print_rows second_pass
-  putStrLn "\n\n"
-  putStrLn . printGrid $ third_pass
-  print_rows third_pass
-  putStrLn "\n\n"
-  putStrLn . printGrid $ fourth_pass
-  print_rows fourth_pass
-  putStrLn "\n\n"
-  putStrLn . printGrid $ fifth_pass
-  print_rows fifth_pass
-  putStrLn "\n\n"
-  putStrLn . printGrid $ sixth_pass
-  print_rows sixth_pass
-  putStrLn "\n\n"
-  putStrLn . printGrid $ seventh_pass
-  print_rows seventh_pass
-  putStrLn "\n\n"
-  putStrLn . printGrid $ eighth_pass
-  print_rows eighth_pass
-  putStrLn "\n\n"
-  putStrLn . printGrid $ ninth_pass
-  print_rows ninth_pass
-  putStrLn "\n\n"
-  putStrLn . printGrid $ tenth_pass
-  print_rows tenth_pass
-  putStrLn "\n\n"
-  print $ isComplete tenth_pass
-  print $ isSolved tenth_pass
-  putStrLn "\n\n"
 
 solveBacktracking pz = do
   putStrLn . printGrid $ pz
   let solved = applyBacktrackingStrategy pz
-  print $ solved
+  case solved of
+    Nothing -> putStrLn "No Solution Found"
+    (Just x) -> putStrLn . printGrid $ x
   putStrLn "\n\n"
 
 main = 
   do
     --input <- readFile "someinvalid.txt"
     input <- readFile "easy50.txt"
+    --input <- readFile "top95-0.txt"
     let puzzles = map readPuzzle $ lines input
     mapM solveBacktracking $ puzzles 
-    --mapM solveAndShow $ puzzles 
-    --mapM debug $ puzzles 
-    --debug $ readPuzzle "380000000000400785009020300060090000800302009000040070001070500495006000000000092"
-    --solveBacktracking $ readPuzzle "100920000524010000000000070050008102000000000402700090060000000000030945000071006"
