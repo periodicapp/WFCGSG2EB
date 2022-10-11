@@ -73,12 +73,16 @@ sortBySum = reverse . (sortOn thrd)
 
 --NEXT
 -- 1. Define splitter (should decline to split when len is less than 4)
+--
 -- 2. Define bestSpans  - which picks the items from a list of triples that sum
 -- the most - for lists of at most 4
+--
 -- 3. Solution is found by picking the best two out of the list that is the
 -- concatenation of: the original non-overlapping solution list, the call to
--- the same function on the remainder and the result of splitting the first
--- list (assuming it is splittable)
+-- the same function on the remainder of the list,  the result of splitting the
+-- first list (assuming it is splittable), and the result of calling the
+-- function on the beg. of the list up to the end of the first half of the
+-- split
 
 
 --buildmatrix - left over from an earlier attempt, but we might want to use it.
