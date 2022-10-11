@@ -1,4 +1,5 @@
 import System.Random
+import Data.Sort
 
 --getList - generate a list of length n of random integers that are between 0
 --and l
@@ -60,6 +61,16 @@ eliminateOverlaps :: [(Int,Int,Int)] -> [(Int,Int,Int)]
 eliminateOverlaps [] = []
 eliminateOverlaps (l:ls) = l : (filter (not . (overlaps l)) ls)
 
+thrd :: (Int,Int,Int) -> Int
+thrd (_,_,e) = e
+
+--sortBySum takes a list of triples, where the last element of the triple
+--represents the sum of a span of an array of Int (and the edges of the span
+--are specified by the first two elements in the triple), and returns the list
+--in descending order by sum
+sortBySum :: [(Int,Int,Int)] -> [(Int,Int,Int)]
+sortBySum = reverse . (sortOn thrd)
+
 --buildmatrix - left over from an earlier attempt, but we might want to use it.
 --Builds a dynamic programming type matrix of differences - first between each
 --element, then between every other element, etc.  Does not attempt to generate
@@ -84,5 +95,5 @@ main = do
   --print $ mat
   print $ maxsum 0 0 dfs
   print $ mxsumi 0 0 0 0 0 [] dfs 
-  print $ eliminateOverlaps $ mxsumi 0 0 0 0 0 [] dfs 
+  print $ sortBySum $ eliminateOverlaps $ mxsumi 0 0 0 0 0 [] dfs 
   --print $ maxsum 0 0 (diffs [5,8,4,4,8,9,8])
