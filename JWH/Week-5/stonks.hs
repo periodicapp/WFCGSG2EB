@@ -43,14 +43,22 @@ iterateCount f m i
   | i == 0 = [(f m)]
   | otherwise = (f m) : iterateCount f (f m) (i-1)
 
---overlaps takes two tuples, the second element of which is a position in an
---array and the first is a width.  These coordinates overlap if the left end of
---the one that's positioned further right is to the left of the other's
---position
-overlaps :: (Int,Int) -> (Int,Int) -> Bool
-overlaps (a,b) (x,y)
-  | y > b = (y - x) < b
-  | b > y = (b - a) < y
+--overlaps takes two triples representing spans in an array along with their
+--sums.  This function doesn't need the sum and so ignores it.  Returns true if
+--the spans overlap, false otherwise.
+overlaps :: (Int,Int,Int) -> (Int,Int,Int) -> Bool
+overlaps (a,b,_) (x,y,_)
+  | y > b = x < b
+  | b > y = a < y
+  | y == b = True
+
+--eliminateOverlaps takes a list of triples representing spans in an array
+--along with their sums.  As it happens, the leftmost element in this list will
+--be the one with the largest sum.  This function retains that one and then
+--removes any that overlap with it from the remainder of the list.
+eliminateOverlaps :: [(Int,Int,Int)] -> [(Int,Int,Int)]
+eliminateOverlaps [] = []
+eliminateOverlaps (l:ls) = l : (filter (not . (overlaps l)) ls)
 
 --buildmatrix - left over from an earlier attempt, but we might want to use it.
 --Builds a dynamic programming type matrix of differences - first between each
@@ -76,4 +84,5 @@ main = do
   --print $ mat
   print $ maxsum 0 0 dfs
   print $ mxsumi 0 0 0 0 0 [] dfs 
+  print $ eliminateOverlaps $ mxsumi 0 0 0 0 0 [] dfs 
   --print $ maxsum 0 0 (diffs [5,8,4,4,8,9,8])
