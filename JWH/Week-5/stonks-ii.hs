@@ -17,18 +17,21 @@ maxProfitsRight lw mpf mn h ((j,l):ls) =
 thrd :: (Int,Int,Int) -> Int
 thrd (_,_,e) = e
 
-mp :: Int -> Int -> Int -> [(Int,Int)] -> [(Int,Int,Int)] -> Int
-mp  _ _ fp [] _ = fp
-mp h mpp fp ((i,l):ll) rr = 
+mp :: Int -> Int -> Int -> ((Int,Int,Int),(Int,Int,Int)) -> [(Int,Int)] -> [(Int,Int,Int)] -> (Int,((Int,Int,Int),(Int,Int,Int)))
+mp  _ _ fp fl [] _ = (fp,fl)
+mp h mpp fp ((x1,x2,x3),(y1,y2,y3)) ((i,l):ll) rr = 
   let
     hg = max h l
+    yy2 = if h > l then y2 else i
     maxprf = max (h - l) mpp
+    yy1 = if h - l > mpp then i else y1
     finalprofit = max fp (maxprf + (thrd $ rr !! i))
+    lhs = if fp > (maxprf + (thrd $ rr !! i)) then (x1,x2,x3) else (rr !! i) 
   in
-    mp hg maxprf finalprofit ll rr
+    mp hg maxprf finalprofit (lhs,(yy1,yy2,maxprf)) ll rr
 
-maxProfit :: [Int] -> [(Int,Int,Int)] -> Int
-maxProfit ll rr = mp 0 0 0 (reverse $ zip [0..] ll) rr
+maxProfit :: [Int] -> [(Int,Int,Int)] -> (Int,((Int,Int,Int),(Int,Int,Int)))
+maxProfit ll rr = mp 0 0 0 ((0,0,0),(0,0,0)) (reverse $ zip [0..] ll) rr
 
 --main = print $ maxProfitsRight 5 0 [5,9,1,2,7,3,8,3,6,5]
 main = do 
