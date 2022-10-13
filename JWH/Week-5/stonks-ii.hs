@@ -40,8 +40,11 @@ mp h mpp fp ((x1,x2,x3),(y1,y2,y3),(z1,z2,z3)) ((i,l):ll) rr =
 maxProfit :: [Int] -> [(Int,Int,Int)] -> (Int,((Int,Int,Int),(Int,Int,Int)))
 maxProfit ll rr = mp (head . reverse $ ll) 0 0 ((0,0,0),(0,0,0),(0,((length ll)-1),0)) (reverse $ zip [0..] ll) rr
 
+showdollar :: Int -> [Char]
+showdollar i = " $" ++ (show i) ++ " "
+
 printResult :: [Int] -> (Int,((Int,Int,Int),(Int,Int,Int))) -> [Char]
-printResult stks (total,((x1,x2,x3),(y1,y2,y3))) = "Buy at " ++ (show x1) ++ " then sell at " ++ (show x2) ++ " to make $" ++ (show x3) ++ "\nthen buy at " ++ (show y1) ++ " and sell at " ++ (show y2) ++ " to make $" ++ (show y3) ++ "\nfor a total profit of: $" ++ (show total) ++ "\n\n"
+printResult stks (total,((x1,x2,x3),(y1,y2,y3))) = "Buy at " ++ (show x1) ++ (showdollar $ stks !! x1) ++ "then sell at " ++ (show x2) ++ (showdollar $ stks !! x2) ++ "to make" ++ (showdollar x3) ++ "\nthen buy at " ++ (show y1) ++ (showdollar $ stks !! y1) ++ " and sell at " ++ (show y2) ++ (showdollar $ stks !! y2) ++ "to make" ++ (showdollar $ y3) ++ "\nfor a total profit of:" ++ (showdollar total) ++ "\n\n"
 
 --main = print $ maxProfitsRight 5 0 [5,9,1,2,7,3,8,3,6,5]
 main = do 
