@@ -4,9 +4,6 @@ class Solution:
         # Finds every number that cannot be used at each specific square in the graph
         # Returns a dictionary of every empty space in each row (Vertexes), and a tuple of the numbers that cannot be used at that point (Colors), 
         # and indexes of other empty spaces that will be affected by this point (Edges)
-        # Finds every number that cannot be used at each specific square in the graph
-        # Returns a dictionary of every empty space in each row (Vertexes), and a tuple of the numbers that cannot be used at that point (Colors), 
-        # and indexes of other empty spaces that will be affected by this point (Edges)
         def buildInterferenceDict(board: List[List[str]]):
             interference = {}
             for x in range(0, 9):
@@ -92,14 +89,13 @@ class Solution:
                 del interferance[mostSatVert]
                 fillBoard(board, interferance)
         interferance = buildInterferenceDict(board)
-        # for x in interferance:
-        #     print(f"{x}: {interferance[x]}")
+        for x in interferance:
+            print(f"{x}: {interferance[x]}")
         fillBoard(board, interferance)
         for x in range(0, 9):
             print()
             for y in range(0,9):
                 print(board[x][y], end=', ')
- 
  
     # Medium LeetCode Problem
     def isValidSudoku(self, board: List[List[str]]) -> bool:
@@ -218,23 +214,3 @@ board = [[".",".","9","7","4","8",".",".","."],
          [".",".",".","2","7","5","9",".","."]]
 
 a.solveSudoku(board)
-
-#  ["8","5","4","2","1","9","7","6","3"],
-#  ["3","9","7","8","6","5","4","2","1"],
-#  ["2","6","1","4","7","3","9","8","5"],
-#  ["7","8","5","1","4","6","3","9","2"],
-#  ["1","4","9","5","3","8","0","7","6"],
-#  ["6","3","2","9","0","7","1","5","4"],
-#  ["9","2","6","3","8","4","5","1","7"],
-#  ["5","1","3","7","9","2","6","4","8"],
-#  ["4","7","8","6","5","1","2","3","9"]
-
-# [["8","5","4","2","1","9","7","6","3"],
-#  ["3","9","7","8","6","5","4","2","1"],
-#  ["2","6","1","4","7","3","9","8","5"],
-#  ["7","8","5","1","2","6","3","9","4"],
-#  ["6","4","9","5","3","8","1","7","2"],
-#  ["1","3","2","9","4","7","8","5","6"],
-#  ["9","2","6","3","8","4","5","1","7"],
-#  ["5","1","3","7","9","2","6","4","8"],
-#  ["4","7","8","6","5","1","2","3","9"]]
