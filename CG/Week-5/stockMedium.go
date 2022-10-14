@@ -25,24 +25,24 @@ func main() {
 }
 
 func maxProfit(prices []int) int {
-	sales := make([]int, 0)
-	currSale := 0
-	currHigh := prices[0]
-	currLow := prices[0]
+	sales := make([]int, 0) // keep track of sales
+	currSale := 0 // tracks the highest sale in a group of increasing nums
+	currHigh := prices[0] // track the current high in a group of increasing nums
+	currLow := prices[0] // track the current low in a group of increasing nums
 	for i, p := range prices {
-		if p > currHigh {
+		if p > currHigh { // if the num is higher, increase only the current high
 			currHigh = p
 		}
-		if p < currHigh {
+		if p < currHigh { // if num is less than current high, you're in a new group of increasing numbers, so reset stuff and add the current highest sale to sales
 			sales = append(sales, currSale)
 			currSale = 0
 			currLow = p
 			currHigh = p
 		}
-		if currHigh > currLow {
+		if currHigh > currLow { // adjust current sale within a group of increasing nums
 			currSale = currHigh - currLow
 		}
-		if i == len(prices) - 1 {
+		if i == len(prices) - 1 { // on the last one, add the sale if necessary
 			if currHigh > currLow {
 				sales = append(sales, currHigh - currLow)
 			}
