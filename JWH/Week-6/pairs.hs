@@ -52,7 +52,15 @@ x <||> y
   | x == mempty = y
   | otherwise = x
 
+--arrangeList - the entry function.  Takes a list and sets up the initial call
+--to arrangePairs.  Returns an arranged list if there is a possible
+--arrangement, otherwise returns failure.
+arrangeList :: [(Int,Int)] -> Maybe [(Int,Int)]
+arrangeList ls = foldl1 (<||>) $ map arrangePairs $ allHeads ls ls
+
 --main = print $ validTails (11,9) [(4,5),(11,9),(9,4)]
 --main = print $ Nothing <||> Just [(1,2)]
 --main = displayPairs $ arrangePairs ((11,9),[(4,5),(9,4)])
-main = displayPairs $ arrangePairs ((11,9),[(5,1),(4,5),(9,4)])
+--main = displayPairs $ arrangePairs ((11,9),[(5,1),(4,5),(9,4)])
+--main = displayPairs $ foldl1 (<||>) $ map arrangePairs $ allHeads [(11,9),(5,1),(4,5),(9,4)] [(11,9),(5,1),(4,5),(9,4)]
+main = displayPairs $ arrangeList [(11,9),(5,1),(4,5),(9,4)]
