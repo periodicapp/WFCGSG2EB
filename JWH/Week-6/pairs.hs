@@ -58,4 +58,6 @@ x <||> y
 arrangeList :: [(Int,Int)] -> Maybe [(Int,Int)]
 arrangeList ls = foldl1 (<||>) $ map arrangePairs $ allHeads ls ls
 
-main = displayPairs $ arrangeList [(11,9),(5,1),(4,5),(9,4)]
+--main = displayPairs $ arrangeList [(11,9),(5,1),(4,5),(9,4)] --succeeds
+--main = displayPairs $ arrangeList [(11,9),(5,1),(4,5),(9,4),(1,13),(8,7),(13,7),(7,6),(8,4),(6,8)] --fails
+main = displayPairs $ arrangeList [(11,9),(5,1),(4,5),(9,4),(1,13),(4,7),(13,7),(7,6),(8,4),(6,8)] --succeeds
