@@ -40,7 +40,7 @@ arrangePairs ((x,y),ls) =
   let
     conts = filter ((==y) . fst) ls
   in
-    if (length conts) == 0 then Nothing else (x,y) `mapp` (foldl1 (<||>) $ map arrangePairs $ (flip allHeads $ ls) conts)
+    if (length conts) == 0 then Nothing else (x,y) `mapp` (foldl1 (<||>) $ map arrangePairs $ allHeads conts ls)
     
 --displayPairs unwraps the Maybe monoid from the result and prints it
 displayPairs :: Maybe [(Int,Int)] -> IO ()
