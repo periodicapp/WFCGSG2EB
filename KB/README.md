@@ -22,3 +22,6 @@ Solutions for WFCGSG2EB problems by Karthik Bangera
     1. `stock_medium.go` - Start with index=1 of the prices array and compare value at index and index-1. If the value at index is greater than value at index - 1. 
     Find the difference between them and set the profit variable to the difference value else proceed to the next index and perform the index to index-1 comparison.
     Upon reaching the end of the prices array the profit variable should have the maximum profit you can achieve
+1. *Week 6 - 2022-10-27 - Find if Path Exists in Graph*:
+    1. `path_easy.py` - Builds a graph with nodes having knowledge of its neighbors. Uses recursive Depth first search from the source and builds a visited array, that keeps track of
+    nodes visited and returns when the source is in the visited list (recursion terminating condition). if the destination is in the visited array there exists a path else there is no path
