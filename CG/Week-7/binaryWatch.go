@@ -5,6 +5,9 @@ import(
 	"math/bits"
 )
 
+// LeetCode Results:
+// Runtime: 0 ms, faster than 100.00% of Go online submissions for Binary Watch.
+// Memory Usage: 2.1 MB, less than 60.78% of Go online submissions for Binary Watch.
 // I didn't come up with this all on my own - had to learn about golang bits stuff a bit.
 // It's a breeze when you have bits.OnesCount
 
