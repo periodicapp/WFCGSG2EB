@@ -5,11 +5,7 @@ import(
 	"strconv"
 )
 
-// This does not work for larger strings of numbers.  It doens't pass the leetcode submission
-// I see there's super shorter ways to do this online but i wasn't understanding those.
-// The recusion part is wrong and it doesn't get all the possibilities when the string gets big.  
-// I can't really explain how it's meant to work as I was just trying a lot of things to 
-// try and get it to work.
+// I changed this and it works better but still doesn't pass. I'll have to figure out if it's something in my validation or what.
 
 func main() {
 	fmt.Println("numDecodings('12')", numDecodings("12"))
