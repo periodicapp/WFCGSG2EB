@@ -1,5 +1,5 @@
-numCombos :: (Char, Int, Int) -> Char -> (Char, Int, Int)
-numCombos (c, a, u) n =
+countCombos :: (Char, Int, Int) -> Char -> (Char, Int, Int)
+countCombos (c, a, u) n =
   case (c, a, u) of
     ('0', a, u) -> (n, 0, a+u)
     ('1', a, u) -> (n, a+u, u)
@@ -7,7 +7,7 @@ numCombos (c, a, u) n =
     otherwise -> (n, 0, a+u)
 
 allCombos :: [Char] -> (Char, Int, Int)
-allCombos = foldl numCombos ('0', 0, 1)
+allCombos = foldl countCombos ('0', 0, 1)
 
 totalCombos :: [Char] -> Int
 totalCombos [] = 0
