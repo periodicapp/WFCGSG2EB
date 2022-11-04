@@ -29,7 +29,7 @@ totalCombos chs =
 --12 3 4 12 6
 --1 23 4 12 6
 
---main = print $ totalCombos "2312612301"
+main = print $ totalCombos "2312612301"
 --main = print $ allCombos "2312612301"
 --2 3 1 2 6 1 2 3 01
 --23 1 2 6 1 2 3 01
