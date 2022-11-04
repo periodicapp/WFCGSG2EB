@@ -19,6 +19,7 @@ func numDecodings(s string) int {
 	allCombos := make([][]string, 0)
 	current := make([]string, 0)
 	findAll(&allCombos, current, 0, s)
+	fmt.Println("ALL COMBOS:", allCombos)
 	return len(validate(allCombos))
 }
 
