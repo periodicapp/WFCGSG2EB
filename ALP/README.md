@@ -29,3 +29,13 @@ As of 09/2022 solutions were created in [Python 3.10.1](https://www.python.org/d
    1. 2 Solutions for the Easy Leetcode Problem: [Every Column has Every Number](https://leetcode.com/problems/check-if-every-row-and-column-contains-all-numbers/)
    2. 1 Solution for the Medium Problem: [Valid Sudoku](https://leetcode.com/problems/valid-sudoku/)
    3. 1 somewhat incomplete solution for Hard Problem: [Sudoku Solver](https://leetcode.com/problems/sudoku-solver)
+5. *[Week5.py](Week5.py) - 2022-10-14 - Stonks*
+   1. 1 solution to [Best Time to Buy and Sell Stock](https://leetcode.com/problems/best-time-to-buy-and-sell-stock/) (**EASY**)
+   2. 1 solution to [Best Time to Buy and Sell Stock II](https://leetcode.com/problems/best-time-to-buy-and-sell-stock-ii/) (**MEDIUM**)
+   3. 2 solutions to [Best Time to Buy and Sell Stock III](https://leetcode.com/problems/best-time-to-buy-and-sell-stock-iii/) (**HARD**)
+6. *[Week7.py](Week7.py) - 2022-11-04 - Encode/Decode*
+   1. 1 solution to [Binary Watch](https://leetcode.com/problems/binary-watch/) (**EASY**)
+   2. 1 solution to [Decode Ways](https://leetcode.com/problems/decode-ways/) (**MEDIUM**)
+   3. 2 solutions to [Decode Ways II](https://leetcode.com/problems/decode-ways-ii/) (**HARD**)
+      1. First solution decodeWaysH uses too much memory for LeetCode
+      2. Second solution decodeWaysQueue utilizes a 3 sized queue to solve the memory issues
