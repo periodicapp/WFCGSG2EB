@@ -20,26 +20,25 @@ func main() {
 }
 
 func numDecodings(s string) int {
-	allPossibilities := make([][]string, 0)
+	allCombos := make([][]string, 0)
 	current := make([]string, 0)
-	startingIndex := 0
-	allPossibilities = validate(findAllCombos(allPossibilities, current, startingIndex, s))
-	return len(allPossibilities)
+	findAll(&allCombos, current, 0, s)
+	return len(validate(allCombos))
 }
 
-func findAllCombos(allCombos [][]string, current []string, currentIndex int, source string) [][]string {
-	if currentIndex >= len(source) {
-			allCombos = append(allCombos, current)
-			return allCombos
-	} else {
-			currentAndOne := append(current, string(source[currentIndex]))
-			allCombos = findAllCombos(allCombos, currentAndOne, currentIndex + 1, source)
-			if currentIndex + 2 <= len(source) {
-				currentAndTwo := append(current, string(source[currentIndex:currentIndex+2]))
-				allCombos = findAllCombos(allCombos, currentAndTwo, currentIndex + 2, source)
-			}
-		return allCombos
+func findAll(all *[][]string, curr []string, index int, source string) {
+	if index == len(source) {
+			*all = append(*all, curr)
+			return
 	}
+	
+	curr1 := append(curr, string(source[index]))
+	if index + 1 < len(source) {
+			curr2 := append(curr, string(source[index:index+2]))
+			findAll(all, curr2, index+2, source)
+	}
+	findAll(all, curr1, index+1, source)
+	return 
 }
 
 func validate(combos [][]string) [][]string {
@@ -56,12 +55,11 @@ func validate(combos [][]string) [][]string {
 							continue
 					}
 			}
-		if comboFailed {
-			continue
-		} else {
-			passingCombos = append(passingCombos, combo)
-		}
+			if comboFailed {
+					continue
+			} else {
+					passingCombos = append(passingCombos, combo)
+			}
 	}
-
 	return passingCombos
 }
