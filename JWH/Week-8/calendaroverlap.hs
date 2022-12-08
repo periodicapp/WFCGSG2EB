@@ -59,7 +59,7 @@ maxOverlap = foldl max3 0
     
 --incOverlap takes two triples, each representing an overlap (i.e. a start and
 --end bound and a number of spans known to intersect with this one) and returns
---a new triple representing the overlap if they overlap, otherwise it just
+--a new triple representing the overlap if they overlap, otherwise Nothing
 --returns the second triple
 incOverlap :: (Int,Int,Int) -> (Int,Int,Int) -> Maybe (Int,Int,Int)
 incOverlap (a,b,i) (x,y,j)
