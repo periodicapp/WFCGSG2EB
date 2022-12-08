@@ -23,13 +23,22 @@ getOverlap (a,b) (x,y) i =
   in
     (aa, bb, i+1)
     
+catMaybes :: [Maybe a] -> [a]
+catMaybes ls = [x | Just x <- ls]
+
+allOverlaps :: [(Int,Int,Int)] -> (Int,Int) -> [(Int,Int,Int)]
+allOverlaps xs (x,y) = [(x,y,0::Int)] ++ (catMaybes $ map (incOverlap (x,y,0)) xs)
+
+bookAll :: [(Int,Int)] -> Int
+bookAll = foldl1 allOverlaps []
+    
 --incOverlap takes two triples, each representing an overlap (i.e. a start and
 --end bound and a number of spans known to intersect with this one) and returns
 --a new triple representing the overlap if they overlap, otherwise it just
 --returns the second triple
 incOverlap :: (Int,Int,Int) -> (Int,Int,Int) -> Maybe (Int,Int,Int)
 incOverlap (a,b,i) (x,y,j)
-  | spanOverlaps (a,b) (x,y) = Just $ getOverlap (a,b) (x,y) i
+  | spanOverlaps (a,b) (x,y) = Just $ getOverlap (a,b) (x,y) j
   | otherwise = Nothing
 
 --test runner function for spanOverlaps
