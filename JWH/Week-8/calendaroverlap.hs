@@ -27,10 +27,10 @@ getOverlap (a,b) (x,y) i =
 --end bound and a number of spans known to intersect with this one) and returns
 --a new triple representing the overlap if they overlap, otherwise it just
 --returns the second triple
-incOverlap :: (Int,Int,Int) -> (Int,Int,Int) -> (Int,Int,Int)
+incOverlap :: (Int,Int,Int) -> (Int,Int,Int) -> Maybe (Int,Int,Int)
 incOverlap (a,b,i) (x,y,j)
-  | spanOverlaps (a,b) (x,y) = getOverlap (a,b) (x,y) i
-  | otherwise = (x,y,j)
+  | spanOverlaps (a,b) (x,y) = Just $ getOverlap (a,b) (x,y) i
+  | otherwise = Nothing
 
 --test runner function for spanOverlaps
 runSpanOverlaps :: ((Int,Int),(Int,Int),Bool) -> Bool
@@ -41,12 +41,12 @@ runSpanOverlaps ((a,b),(x,y),t) =
     result == t
 
 --test runner function for incOverlap
-runIncOverlap :: ((Int,Int,Int),(Int,Int,Int),(Int,Int,Int)) -> Bool
-runIncOverlap ((a,b,i),(x,y,j),(q,r,s)) = 
+runIncOverlap :: ((Int,Int,Int),(Int,Int,Int),Maybe (Int,Int,Int)) -> Bool
+runIncOverlap ((a,b,i),(x,y,j),r) = 
   let
     result = incOverlap (a,b,i) (x,y,j)
   in
-    result == (q,r,s)
+    result == r
 
 --main = print $ all runSpanOverlaps [((10,20),(15,20),True)
 --                            ,((10,20),(50,60),False)
@@ -57,11 +57,11 @@ runIncOverlap ((a,b,i),(x,y,j),(q,r,s)) =
 --                            ,((50,60),(25,55),True)
 --                           ]
 
-main = print $ all runIncOverlap [((10,20,0),(15,20,0),(15,20,1))
-                              ,((10,20,0),(50,60,0),(50,60,0))
-                              ,((10,20,0),(10,40,0),(10,20,1))
-                              ,((10,20,0),(5,15,0),(10,15,1))
-                              ,((10,20,0),(5,10,0),(5,10,0))
-                              ,((10,20,0),(25,55,0),(25,55,0))
-                              ,((50,60,0),(25,55,0),(50,55,1))
+main = print $ all runIncOverlap [((10,20,0),(15,20,0), Just (15,20,1))
+                              ,((10,20,0),(50,60,0), Nothing)
+                              ,((10,20,0),(10,40,0), Just (10,20,1))
+                              ,((10,20,0),(5,15,0), Just (10,15,1))
+                              ,((10,20,0),(5,10,0), Nothing)
+                              ,((10,20,0),(25,55,0),Nothing)
+                              ,((50,60,0),(25,55,0),Just (50,55,1))
                               ]
