@@ -82,7 +82,7 @@ class Solution:
                 elif s[i] == '2' and s[i+1] <= '6':
                     # Grow the combo count 
                     dp[i] += dp[i+2]
-            # print(dp)
+            print(dp)
             i -= 1
         return dp[0]
                      
@@ -120,8 +120,6 @@ class Solution:
                     dp[i] += dp[i+2]
                 elif s[i] == '1':
                     dp[i] += dp[i+2]
-                if len(dp) > 20:
-                    dp = dp[0:i+2]
                 # print(dp)
             i -= 1
         return dp[0] % (10**9 + 7)
@@ -163,7 +161,7 @@ class Solution:
 a = Solution()
 print(a.readBinaryWatch(1))
 print(a.numDecodingsRedux("111140"))
-print(a.numDecodingsRedux('456786'))
+print(a.numDecodingsRedux('16272826'))
 print(a.numDecodingsH("*2*1*1*1*"))
 print(a.numDecodingsQueue("**1*2**"))
     
